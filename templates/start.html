@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang=en>
     <head>
-        <title></title>
+        <title>TriviaMasters</title>
     </head>
+    <body></body>
         <nav class="navbar navbar-dark bg-primary">
             <a class="navbar-brand" href="#">
                 <span class="navbar-brand mb-0 h1">TriviaMasters</span>
             </a>
         </nav>
+        {% if session.user_id %}
+            <ul class="navbar-nav ml-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+            </ul>
+        {% else %}
+            <ul class="navbar-nav ml-auto mt-2">
+                <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+            </ul>
+        {% endif %}
+    </body>
