@@ -36,4 +36,31 @@ Session(app)
 db = SQL("sqlite:///finance.db")
 
 @app.route("/register", methods=["GET", "POST"])
-    if methods == "POST":
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
+        # Check if confirmation and password are the same, if  password is filled in and if username is filled in, if not return apology
+        if confirmation != password:
+            return apology("verkeerd wachtwoord", 400)
+        elif not password:
+            return apology("must provide password", 400)
+        elif not username:
+            return apology("must provide username", 400)
+        # Query in users for username
+        rows = db.execute("SELECT * FROM users WHERE username = :username",
+                          username=request.form.get("username"))
+        # If username already exists return apology
+        if len(rows) != 0:
+            return apology("username already exists", 400)
+        # Make a hash of the password
+        hashe = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+        # Insert username and hash in the database
+        db.execute("INSERT INTO users (username, hash) values (:username,:hash)", username=username, hash=hashe)
+        # Return to login page
+        return render_template("home_user")
+    else:
+        # User reached route via GET (as by clicking a link or via redirect)
+        return render_template("register.html")
+
