@@ -1,14 +1,19 @@
 /* navbar */
 .navbar {
-    background-color: #bfd833;
+    background-color: #07eb62;
 }
 body {
-    background-color: gray;
+    background-color: #29f5dc;
+    font-family: "Comic Sans";
 }
 nav .navbar-brand
 {
     /* size for brand */
     font-size: xx-large;
+}
+
+li {
+    font-family: "Roboto", sans-serif;
 }
 
 /* colors for brand */
