@@ -36,30 +36,91 @@ db = SQL("sqlite:///trivia.db")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        confirmation = request.form.get("confirmation")
-        # Check if confirmation and password are the same, if  password is filled in and if username is filled in, if not return apology
-        if confirmation != password:
-            return apology("verkeerd wachtwoord", 400)
-        elif not password:
-            return apology("must provide password", 400)
-        elif not username:
+
+        # checks if username is filled in
+        if not request.form.get("username"):
             return apology("must provide username", 400)
-        # Query in users for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username",
-                          username=request.form.get("username"))
-        # If username already exists return apology
-        if len(rows) != 0:
-            return apology("username already exists", 400)
-        # Make a hash of the password
-        hashe = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
-        # Insert username and hash in the database
-        db.execute("INSERT INTO users (username, hash) values (:username,:hash)", username=username, hash=hashe)
-        # Return to login page
-        return render_template("home_user")
+
+        # checks if password was filled in
+        elif not request.form.get("password"):
+            return apology("must provide password", 400)
+
+        # checks if passwords match
+        elif request.form.get("password") != request.form.get("confirmation"):
+            return apology("password doesn't match", 400)
+
+        result = db.execute("SELECT * FROM users \
+                            WHERE username=:username", username=request.form.get("username"))
+
+        if result:
+            return apology("Username already exist", 400)
+
+        #creates user
+        session["user_id"] = db.execute("INSERT INTO users (username, hash) \
+                             VALUES(:username, :hash)", \
+                             username=request.form.get("username"), \
+                             hash=generate_password_hash(request.form.get("password")))
+
+        return redirect("start.html")
+
     else:
-        # User reached route via GET (as by clicking a link or via redirect)
         return render_template("register.html")
 
+@app.route("/check", methods=["GET"])
+def check():
+    """Return true if username available, else false, in JSON format"""
+    result = db.execute("SELECT * FROM users \
+                            WHERE username=:username", username=request.args.get("username"))
+    if len(result) > 0:
+        return jsonify(False)
+    else:
+        return jsonify(True)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Log user in"""
+
+    # Forget any user_id
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+
+        # Query database for username
+        rows = db.execute("SELECT * FROM users WHERE username = :username",
+                          username=request.form.get("username"))
+
+        # Ensure username exists and password is correct
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+            return apology("invalid username and/or password", 403)
+
+        # Remember which user has logged in
+        session["user_id"] = rows[0]["id"]
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
