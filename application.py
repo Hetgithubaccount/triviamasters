@@ -63,3 +63,6 @@ def register():
         # User reached route via GET (as by clicking a link or via redirect)
         return render_template("register.html")
 
+@app.route("/start", methods =["GET", "POST"])
+def start():
+    print("test")
