@@ -33,7 +33,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = sqlite3.connect("trivia.db")
+db = open("trivia.db", "w")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -64,7 +64,7 @@ def register():
                              username=request.form.get("username"), \
                              hash=generate_password_hash(request.form.get("password")))
 
-        return redirect("start.html")
+        return redirect("index.html")
 
     else:
         return render_template("register.html")
@@ -110,7 +110,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return redirect("start.html")
+        return redirect("index.html")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -126,9 +126,8 @@ def logout():
     # Redirect user to login form
     return redirect("start.html")
 
-@app.route("/singlegamestart", methods=["GET", "POST"])
-def singlegamestart():
-
+@app.route("/", methods=["GET", "POST"])
+def start():
     if request.method == "POST":
         if not request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
             return apology("must provide username", 403)
@@ -137,13 +136,16 @@ def singlegamestart():
         elif not request.form.get("number"):
             return apology("must provide game code", 403)
         elif request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
-            return redirect("game.html")
+            return render_template("index.html")
         elif request.form.get("username2") and request.form.get("number") and not request.form.get("username"):
-            result = db.execute("SELECT codes FROM singlegames WHERE codes:= number", number=request.form.get("number"))
+            result = db.execute("SELECT * FROM spel WHERE gameid:= number", number=request.form.get("number"))
             if result:
-                return redirect("game.html")
+                return render_template("index.html")
+            else:
+                return apology("must fill in active code", 403)
     else:
-        return render_template("start.html")
+        return render_template("index.html")
+
 
 
 
@@ -152,6 +154,7 @@ def errorhandler(e):
     if not isinstance(e, HTTPException):
         e = InternalServerError()
     return apology(e.name, e.code)
+
 
 
 @app.route("/start", methods =["GET", "POST"])
