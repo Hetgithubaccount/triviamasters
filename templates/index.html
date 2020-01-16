@@ -6,16 +6,17 @@
 
 {% block main %}
     <form action="/start" method="post">
-        <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+        <div class="form-start">
+            <input autocomplete="off" autofocus class="form-start" name="username" placeholder="Username" type="text">
         </div>
         <button class="btn btn-primary" type="submit">Start spel</button>
     </form>
+
     <form action="/join" method="post">
-        <div class="form-group">
+        <div class="form-join">
             <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
-        <div class="form-group">
-            <input class="form-control" name="number" placeholder="Code" type="text">
+        <div class="form-join">
+            <input class="form-join" name="number" placeholder="Code" type="text">
         </div>
         <button class="btn btn-primary" type="submit">Join spel</button>
     </form>
