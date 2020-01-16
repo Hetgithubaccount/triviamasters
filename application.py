@@ -6,6 +6,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+import sqlite3
 
 from helpers import apology, login_required
 
@@ -32,7 +33,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = "trivia.db"
+db = sqlite3.connect("survey.db")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -124,6 +125,27 @@ def logout():
 
     # Redirect user to login form
     return redirect("start.html")
+
+@app.route("/singlegamestart", methods=["GET", "POST"])
+def singlegamestart():
+
+    if request.method == "POST":
+        if not request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
+            return apology("must provide username", 403)
+        elif not request.form.get("username2"):
+            return apology("must provide username", 403)
+        elif not request.form.get("number"):
+            return apology("must provide game code", 403)
+        elif request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
+            return redirect("game.html")
+        elif request.form.get("username2") and request.form.get("number") and not request.form.get("username"):
+            result = db.execute("SELECT codes FROM singlegames WHERE codes:= number", number=request.form.get("number"))
+            if result:
+                return redirect("game.html")
+    else:
+        return render_template("start.html")
+
+
 
 def errorhandler(e):
     """Handle error"""
