@@ -2,17 +2,30 @@
 .navbar navbar-expand-md navbar-light bg-light border {
     color: #07eb62;
 }
-form {
-    font: "Arial";
+.form-start {
+    display: inline-block;
+    padding-left: 20px;
+    margin-left: 180px;
+    margin-left: 0;
+    font-family: "Arial";
 }
+.form-join {
+    display: inline-block;
+    padding-left: 20px;
+    margin-left: 180px;
+    margin-left: 0;
+    bottom: 100px;
+    font-family: "Arial";
+}
+
 body {
     background-color: #29f5dc;
     font-family: "Times New Roman";
 }
-nav .navbar-brand
+.navbar-brand
 {
     /* size for brand */
-    font:"MV Boli";
+    font-family:"Arial";
     font-size: xx-large;
 }
 
