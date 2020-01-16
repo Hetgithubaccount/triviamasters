@@ -6,6 +6,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+import random
 import sqlite3
 
 from helpers import apology, login_required
@@ -137,8 +138,15 @@ def start():
     else:
         return render_template("index.html")
 
+@app.route("/wacht", methods=["GET", "POST"])
+def wacht():
+    if request.method == "POST":
 
-
+        code = random.randrange(100000, 999999)
+        print(code)
+        return render_template("wacht.html", code=code)
+    else:
+        return redirect("/")
 
 def errorhandler(e):
     """Handle error"""
