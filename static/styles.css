@@ -26,8 +26,14 @@ body {
 nav .navbar-brand
 {
     /* size for brand */
-    font-family:"Bubblegum Sans";
-    font-size: xx-large;
+    font-family:"Arial";
+    font-weight: bold;
+    font-size: 45px;
+}
+#players
+{
+    border-style: solid;
+    display: inline;
 }
 
 /* colors for brand */
