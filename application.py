@@ -52,8 +52,7 @@ def register():
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("password doesn't match", 400)
 
-        result = db.execute("SELECT * FROM users \
-                            WHERE username=:username", username=request.form.get("username"))
+        result = db.execute("SELECT * FROM users WHERE username=:username", username=request.form.get("username"))
 
         if result:
             return apology("Username already exist", 400)
@@ -157,7 +156,4 @@ def errorhandler(e):
 
 
 
-@app.route("/start", methods =["GET", "POST"])
-def start():
-    if request.method == "POST":
-        print("hoi")
+
