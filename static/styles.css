@@ -18,20 +18,22 @@
 }
 nav {
     background-color: transparent;
-    border: 0;
+    color: white;
 }
 body {
     background-image: url("background.jpg");
     background-size: 100%;
     background-color: #d3d3d3;
     font-family: "Arial";
+    color: white;
+    font-weight: bolder;
 }
 nav .navbar-brand
 {
     /* size for brand */
     font-family:"Arial";
-    color: #FFF;
-    font-weight: bold;
+    color: white !important;
+    font-weight: normal;
     font-size: 45px;
 }
 #navbar{
