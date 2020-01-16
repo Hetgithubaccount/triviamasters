@@ -33,7 +33,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = open("trivia.db", "w")
+conn = sqlite3.connect('trivia.db')
+db = conn.cursor()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -52,7 +53,8 @@ def register():
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("password doesn't match", 400)
 
-        result = db.execute("SELECT * FROM users WHERE username=:username", username=request.form.get("username"))
+        result = db.execute("SELECT * FROM users \
+                            WHERE username=:username", username=request.form.get("username"))
 
         if result:
             return apology("Username already exist", 400)
