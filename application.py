@@ -142,7 +142,8 @@ def singlegamestart():
             result = db.execute("SELECT codes FROM singlegames WHERE codes:= number", number=request.form.get("number"))
             if result:
                 return redirect("game.html")
-
+    else:
+        return render_template("start.html")
 
 
 
