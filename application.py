@@ -33,7 +33,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = sqlite3.connect("survey.db")
+db = sqlite3.connect("trivia.db")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
