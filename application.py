@@ -126,6 +126,26 @@ def logout():
     # Redirect user to login form
     return redirect("start.html")
 
+@app.route("/singlegamestart", methods=["GET", "POST"])
+def singlegamestart():
+
+    if request.method == "POST":
+        if not request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
+            return apology("must provide username", 403)
+        elif not request.form.get("username2"):
+            return apology("must provide username", 403)
+        elif not request.form.get("number"):
+            return apology("must provide game code", 403)
+        elif request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
+            return redirect("game.html")
+        elif request.form.get("username2") and request.form.get("number") and not request.form.get("username"):
+            result = db.execute("SELECT codes FROM singlegames WHERE codes:= number", number=request.form.get("number"))
+            if result:
+                return redirect("game.html")
+
+
+
+
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
