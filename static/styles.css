@@ -17,20 +17,28 @@
     font-family: "Arial";
 }
 nav {
-    background-color: #3366ff;
+    background-color: transparent;
+    border: 0;
 }
 body {
     background-image: url("background.jpg");
     background-size: 100%;
-    background-color: white;
+    background-color: #d3d3d3;
     font-family: "Arial";
 }
 nav .navbar-brand
 {
     /* size for brand */
     font-family:"Arial";
+    color: #FFF;
     font-weight: bold;
     font-size: 45px;
+}
+#navbar{
+    font-size: 1.3em;
+    font-weight: bolder;
+    box-shadow: none;
+
 }
 #players
 {
@@ -39,25 +47,6 @@ nav .navbar-brand
     position: fixed;
     right: 80px;
 }
-
-/* colors for brand */
-nav .navbar-brand .orange
-{
-    color: #FFA500;
-}
-nav .navbar-brand .red
-{
-    color: #ea433b;
-}
-nav .navbar-brand .yellow
-{
-    color: #f5b82e;
-}
-nav .navbar-brand .green
-{
-    color: #2e944b;
-}
-
 main .form-control
 {
     /* center form controls */
