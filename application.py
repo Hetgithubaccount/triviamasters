@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 
 from helpers import apology, login_required
+import json
 
 # Configure application
 app = Flask(__name__)
@@ -33,7 +34,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-conn = sqlite3.connect('trivia.db')
+conn = sqlite3.connect("trivia.db")
 db = conn.cursor()
 
 @app.route("/register", methods=["GET", "POST"])
