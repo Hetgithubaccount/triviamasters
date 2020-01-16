@@ -128,20 +128,9 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 def start():
     if request.method == "POST":
-        if not request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
+        if not request.form.get("username"):
             return apology("must provide username", 403)
-        elif not request.form.get("username2"):
-            return apology("must provide username", 403)
-        elif not request.form.get("number"):
-            return apology("must provide game code", 403)
-        elif request.form.get("username") and not request.form.get("username2") and not request.form.get("number"):
-            return render_template("index.html")
-        elif request.form.get("username2") and request.form.get("number") and not request.form.get("username"):
-            result = db.execute("SELECT * FROM spel WHERE gameid:= number", number=request.form.get("number"))
-            if result:
-                return render_template("index.html")
-            else:
-                return apology("must fill in active code", 403)
+        return render_template("wacht.html")
     else:
         return render_template("index.html")
 
