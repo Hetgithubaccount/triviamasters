@@ -58,6 +58,7 @@ main .form-control
 }
 #code {
     border-style: solid;
+    display: inline;
 }
 main
 {
