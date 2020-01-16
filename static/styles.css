@@ -1,7 +1,3 @@
-/* navbar */
-.navbar navbar-expand-md navbar-light bg-light border {
-    color: #07eb62;
-}
 .form-start {
     display: inline-block;
     padding-left: 20px;
@@ -14,7 +10,10 @@
     padding-left: 20px;
     margin-left: 180px;
     margin-left: 0;
-    bottom: 100px;
+    font-family: "Arial";
+}
+.btn btn-primary{
+    margin-left: 0;
     font-family: "Arial";
 }
 
@@ -22,11 +21,16 @@ body {
     background-color: #29f5dc;
     font-family: "Times New Roman";
 }
-.navbar-brand
+.navbar-custom:
+{
+    background-color: yellow;
+}
+nav .navbar-brand
 {
     /* size for brand */
     font-family:"Arial";
     font-size: xx-large;
+    color: black;
 }
 
 li {
