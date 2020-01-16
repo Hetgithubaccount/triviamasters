@@ -6,6 +6,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+import sqlite3
 
 from helpers import apology, login_required
 
@@ -32,7 +33,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = "trivia.db"
+db = sqlite3.connect("survey.db")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
