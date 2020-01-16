@@ -5,10 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    <h3 id="code">hier komt de code</h3>
-    <div id="players">
-        <h4> player 1: harry</h4>
-        <h4> player 2: sjaak </h4>
-    </div>
-     <button class="btn btn-primary" type="submit">Start spel</button>
+    <form action="/wacht" method="post">
+    <h3 id="code">Code: </h3>
+        <div class="loader"></div>
+    </form>
 {% endblock %}
