@@ -5,13 +5,14 @@
 {% endblock %}
 
 {% block main %}
+    <h3>Eenmalig spel aanmaken</h3>
     <form action="/" method="post">
         <div class="form-start">
             <input autocomplete="off" autofocus class="form-start" name="username" placeholder="Username" type="text">
         </div>
         <button class="btn btn-primary" class= "form-start" type="submit">Start spel</button>
     </form>
-
+    <h3>Spel joinen</h3>
     <form action="/join" method="post">
         <div class="form-join">
             <input autocomplete="off" autofocus class="form-join" name="username" placeholder="Username" type="text">
