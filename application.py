@@ -156,4 +156,5 @@ def errorhandler(e):
 
 @app.route("/start", methods =["GET", "POST"])
 def start():
-    print("test")
+    if request.method == "POST":
+        print("hoi")
