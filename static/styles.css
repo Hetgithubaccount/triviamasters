@@ -1,14 +1,18 @@
 /* navbar */
-.navbar {
-    background-color: #07eb62;
+.navbar navbar-expand-md navbar-light bg-light border {
+    color: #07eb62;
+}
+form {
+    font: "Arial";
 }
 body {
     background-color: #29f5dc;
-    font-family: "Comic Sans";
+    font-family: "Times New Roman";
 }
 nav .navbar-brand
 {
     /* size for brand */
+    font:"MV Boli";
     font-size: xx-large;
 }
 
