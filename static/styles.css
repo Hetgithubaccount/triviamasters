@@ -20,7 +20,9 @@ nav {
     background-color: #3366ff;
 }
 body {
-    background-color: #29f5dc;
+    background-image: url("background.jpg");
+    background-size: 100%;
+    background-color: white;
     font-family: "Arial";
 }
 nav .navbar-brand
@@ -34,6 +36,8 @@ nav .navbar-brand
 {
     border-style: solid;
     display: inline;
+    position: fixed;
+    right: 80px;
 }
 
 /* colors for brand */
