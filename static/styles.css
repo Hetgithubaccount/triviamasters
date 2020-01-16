@@ -1,13 +1,25 @@
+/* navbar */
+.navbar {
+    background-color: #07eb62;
+}
+body {
+    background-color: #29f5dc;
+    font-family: "Comic Sans";
+}
 nav .navbar-brand
 {
     /* size for brand */
     font-size: xx-large;
 }
 
+li {
+    font-family: "Roboto", sans-serif;
+}
+
 /* colors for brand */
-nav .navbar-brand .blue
+nav .navbar-brand .orange
 {
-    color: #537fbe;
+    color: #FFA500;
 }
 nav .navbar-brand .red
 {
