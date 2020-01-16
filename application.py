@@ -142,7 +142,11 @@ def start():
 def wacht():
     if request.method == "POST":
         code = random.randrange(100000, 999999)
-        print(code)
+        opponent = None
+        while opponent == None:
+            opponent = "harry"
+            return render_template("wacht.html")
+
         return render_template("spelstart.html", code=code)
     else:
         return render_template("wacht.html")
