@@ -41,6 +41,9 @@ db = conn.cursor()
 games = list()
 singlegameplayers = dict()
 
+
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -178,27 +181,37 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-        # nieuwe vraag
+    score = 0
+    quest = newquestion()
+    question = quest[0]
+    coranswer = quest[1]
+    answerlist = quest[2]
+
     if request.method == "POST":
-        with open('questions.csv', newline='') as csv_file:
-            reader = list(csv.reader(csv_file))
+        ingevuld = str(request.form.get("answer"))
+        print(ingevuld)
+        if ingevuld == coranswer:
+            score += 1
+            print(score)
+        quest = newquestion()
+        question = quest[0]
+        coranswer = quest[1]
+        answerlist = quest[2]
+
+        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer)
+    else:
+        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer)
+
+
+def newquestion():
+    with open('questions.csv', newline='') as csv_file:
+            reader = list(csv.reader(csv_file))    # nieuwe vraag
             sequence = random.choice(reader)
             question = sequence[3]
             coranswer = sequence[4]
             print(coranswer)
             answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
-            score = 0
-            ingevuld = str(request.form.get("answer"))
-            print(ingevuld)
-            if ingevuld == coranswer:
-                score += 1
-                print(score)
-            else:
-                score = score
-            # if request.method == "POST":
-            #     i = None
-            return render_template("game.html",  score = score, question=question, answerlist=answerlist)
-
+    return [question, coranswer, answerlist]
 
 def errorhandler(e):
     """Handle error"""
