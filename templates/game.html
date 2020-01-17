@@ -8,8 +8,8 @@
 
      <H2 class = "question"> {{question}}</H2>
      <form action="/game" method="post">
-     {% for answer in answers %}
-     <button class="btn default", name= "answer">{{answer}}</button>
+     {% for option in answers %}
+     <button class="btn default" name="answer" type="submit" value="{{ option }}">{{ option }}</button>
      {%endfor%}
      </div>
      </form>
