@@ -176,6 +176,15 @@ def wacht():
 def startsinglegame():
     question = "hoeveel kippen heeft napoleon?"
     answers = {"12","2","3","0"}
+    correct = "2"
+    score = 0
+    if request.method == "POST":
+        ingevuld = request.form.get("answer")
+        if ingevuld == correct:
+            score += 1
+            print(score)
+        else:
+            score = score
     # if request.method == "POST":
     #     i = None
     return render_template("game.html", question=question, answers = answers)
