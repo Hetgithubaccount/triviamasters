@@ -164,7 +164,7 @@ def wacht():
     else:
         return render_template("wacht.html")
 
-@app.route("startsinglegame", methods=["GET", "POST"])
+@app.route("/startsinglegame", methods=["GET", "POST"])
 def startsinglegame():
     if request.method == "POST":
         i = None
