@@ -151,26 +151,27 @@ def start():
                     singlegameplayers[request.form.get("username")] = code
                     newgame = False
 
-            return render_template("wacht.html", code= code)
+            return render_template("wacht.html", code= code, username=request.form.get("username"))
         elif request.form.get("opponent") and request.form.get("number"):
             singlegameplayers[request.form.get("opponent")] = code
-            return render_template("game.html")
+            return render_template("spelstart.html")
     else:
         return render_template("index.html")
 
 @app.route("/wacht", methods=["GET", "POST"])
 def wacht():
-    if request.method == "POST":
+    opponent = None
+    while opponent == None:
+        for i in singlegameplayers:
+            if singlegameplayers[i] == code and i != username:
+                return render_template("spelstart.html")
+
+        time.sleep(10)
+
+    return render_template("wacht.html")
 
 
-        opponent = None
-        while opponent == None:
-            opponent = "harry"
-            return render_template("wacht.html")
 
-        return render_template("spelstart.html")
-    else:
-        return render_template("wacht.html")
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
