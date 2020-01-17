@@ -6,10 +6,10 @@
 
 {% block main %}
 
-     <H2 class = "question"> hier komt de vraag</H2>
-     <button class="btn default">Antwoord 1</button>
-     <button class="btn default">Antwoord 2</button>
-     <button class="btn default">Antwoord 3</button>
-     <button class="btn default">Antwoord 4</button>
-
+     <H2 class = "question"> {{question}}</H2>
+     <div>
+     {% for answer in answers %}
+     <button class="btn default">{{answer}}</button>
+     {%endfor%}
+     </div>
 {% endblock %}

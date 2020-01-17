@@ -175,9 +175,11 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
+    question = "hoeveel kippen heeft napoleon?"
+    answers = {"12","2","3","0"}
     # if request.method == "POST":
     #     i = None
-    return render_template("game.html")
+    return render_template("game.html", question=question, answers = answers)
 
 
 def errorhandler(e):
