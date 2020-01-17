@@ -136,13 +136,15 @@ def start():
     if request.method == "POST":
         if not request.form.get("username"):
             return apology("must provide username", 403)
-        newgame = True
-        while newgame:
-            code = random.randrange(100000, 999999)
-            if code not in games:
-                games.append(code)
-                singlegameplayers[request.form.get("username")] = code
-                newgame = False
+        else:
+            newgame = True
+            while newgame:
+                code = random.randrange(100000, 999999)
+                if code not in games:
+                    games.append(code)
+                    singlegameplayers[request.form.get("username")] = code
+                    newgame = False
+
 
         return render_template("wacht.html")
     else:
@@ -158,13 +160,14 @@ def wacht():
             opponent = "harry"
             return render_template("wacht.html")
 
-        return render_template("spelstart.html", code=code)
+        return render_template("spelstart.html")
     else:
         return render_template("wacht.html")
 
 @app.route("startsinglegame", methods=["GET", "POST"])
 def startsinglegame():
     if request.method == "POST":
+        i = None
 
 
 
