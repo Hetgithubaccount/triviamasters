@@ -5,13 +5,10 @@
 {% endblock %}
 
 {% block main %}
-
-     <H2 class = "question"> {{question}}</H2>
+     <H2 class = "question"> test</H2>
      <form action="/game" method="post">
      <div>
-     {% for option in answers %}
-     <button class="btn default" name="answer" type="submit" value="{{ option}}">{{ option }}</button>
-     {%endfor%}
+     <button class="btn default" name="answer" type="submit" value="{{ option}}">test</button>
      </div>
      </form>
      {{ score }}
