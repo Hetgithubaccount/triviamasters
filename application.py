@@ -37,6 +37,8 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 conn = sqlite3.connect("trivia.db")
 db = conn.cursor()
+games = list()
+singlegameplayers = dict()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -134,14 +136,23 @@ def start():
     if request.method == "POST":
         if not request.form.get("username"):
             return apology("must provide username", 403)
+        newgame = True
+        while newgame:
+            code = random.randrange(100000, 999999)
+            if code not in games:
+                games.append(code)
+                singlegameplayers[request.form.get("username")] = code
+                newgame = False
+
         return render_template("wacht.html")
     else:
-        return render_template("index.html")
+        return render_template("/")
 
 @app.route("/wacht", methods=["GET", "POST"])
 def wacht():
     if request.method == "POST":
-        code = random.randrange(100000, 999999)
+
+
         opponent = None
         while opponent == None:
             opponent = "harry"
@@ -150,6 +161,12 @@ def wacht():
         return render_template("spelstart.html", code=code)
     else:
         return render_template("wacht.html")
+
+@app.route("startsinglegame", methods=["GET", "POST"])
+def startsinglegame():
+    if request.method == "POST":
+
+
 
 
 def errorhandler(e):
