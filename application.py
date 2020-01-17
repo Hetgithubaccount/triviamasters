@@ -148,7 +148,7 @@ def start():
 
         return render_template("wacht.html")
     else:
-        return render_template("/")
+        return render_template("index.html")
 
 @app.route("/wacht", methods=["GET", "POST"])
 def wacht():
