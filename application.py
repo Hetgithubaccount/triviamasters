@@ -150,14 +150,18 @@ def start():
                     newgame = False
 
             return render_template("wacht.html", code= code, username=request.form.get("username"))
-        elif request.form.get("opponent") and request.form.get("number"):
-            if code in games:
-                singlegameplayers[request.form.get("opponent")] = code
-                return render_template("spelstart.html")
-            else:
-                return apology("enter valid code", 403)
     else:
         return render_template("index.html")
+
+@app.route("/join", methods=["GET", "POST"])
+def join():
+    if request.form.get("opponent") and request.form.get("number"):
+        code = request.form.get("number")
+        if code in games:
+            singlegameplayers[request.form.get("opponent")] = code
+            return render_template("game.html")
+        else:
+            return apology("enter valid code", 403)
 
 @app.route("/wacht", methods=["GET", "POST"])
 def wacht():
@@ -165,7 +169,7 @@ def wacht():
     while opponent == None:
         for i in singlegameplayers:
             if singlegameplayers[i] == code and i != username:
-                return render_template("spelstart.html")
+                return render_template("game.html")
 
         time.sleep(10)
 
