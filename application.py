@@ -166,8 +166,8 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-    if request.method == "POST":
-        i = None
+    # if request.method == "POST":
+    #     i = None
     return render_template("game.html")
 
 
