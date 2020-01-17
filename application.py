@@ -213,7 +213,7 @@ def newquestion():
             answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
     return [question, coranswer, answerlist]
 
-@app.route("/game", methods=["GET", "POST"])
+@app.route("/eind", methods=["GET", "POST"])
 def eind():
     return render_template("eind.html")
 def errorhandler(e):
