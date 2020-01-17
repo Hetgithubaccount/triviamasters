@@ -8,6 +8,7 @@ from werkzeug.exceptions import default_exceptions, HTTPException, InternalServe
 from werkzeug.security import check_password_hash, generate_password_hash
 import random
 import sqlite3
+import csv
 
 from helpers import apology, login_required
 import json
@@ -174,12 +175,16 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-    question = "hoeveel kippen heeft napoleon?"
-    answers = {"12","2","3","0"}
+    with open('general.csv', newline='') as csv_file:
+        reader = csv.reader(csv_file)
+        for row in reader:
+            print(row)
+
     correct = "2"
     score = 0
     if request.method == "POST":
-        ingevuld = request.form.get("answer")
+        ingevuld = str(request.form.get("answer"))
+        print(ingevuld)
         if ingevuld == correct:
             score += 1
             print(score)
@@ -187,7 +192,7 @@ def startsinglegame():
             score = score
     # if request.method == "POST":
     #     i = None
-    return render_template("game.html", question=question, answers = answers, score = score)
+    return render_template("game.html",  score = score)
 
 
 def errorhandler(e):
