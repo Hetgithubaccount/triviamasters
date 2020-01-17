@@ -176,27 +176,28 @@ def wacht():
 
     return render_template("wacht.html")
 
-
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-    with open('general.csv', newline='') as csv_file:
-        reader = csv.reader(csv_file)
-        for row in reader:
-            print(row)
-
-    correct = "2"
-    score = 0
+        # nieuwe vraag
     if request.method == "POST":
-        ingevuld = str(request.form.get("answer"))
-        print(ingevuld)
-        if ingevuld == correct:
-            score += 1
-            print(score)
-        else:
-            score = score
-    # if request.method == "POST":
-    #     i = None
-    return render_template("game.html",  score = score)
+        with open('questions.csv', newline='') as csv_file:
+            reader = list(csv.reader(csv_file))
+            sequence = random.choice(reader)
+            question = sequence[3]
+            coranswer = sequence[4]
+            print(coranswer)
+            answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
+            score = 0
+            ingevuld = str(request.form.get("answer"))
+            print(ingevuld)
+            if ingevuld == coranswer:
+                score += 1
+                print(score)
+            else:
+                score = score
+            # if request.method == "POST":
+            #     i = None
+            return render_template("game.html",  score = score, question=question, answerlist=answerlist)
 
 
 def errorhandler(e):
