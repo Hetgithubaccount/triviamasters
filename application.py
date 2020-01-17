@@ -164,12 +164,11 @@ def wacht():
     else:
         return render_template("wacht.html")
 
-@app.route("/startsinglegame", methods=["GET", "POST"])
+@app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
     if request.method == "POST":
         i = None
-
-
+    return render_template("game.html")
 
 
 def errorhandler(e):
