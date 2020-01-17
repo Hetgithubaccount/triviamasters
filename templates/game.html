@@ -7,9 +7,10 @@
 {% block main %}
 
      <H2 class = "question"> {{question}}</H2>
-     <div>
+     <form action="/game" method="post">
      {% for answer in answers %}
-     <button class="btn default">{{answer}}</button>
+     <button class="btn default", name= "answer">{{answer}}</button>
      {%endfor%}
      </div>
+     </form>
 {% endblock %}
