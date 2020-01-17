@@ -191,7 +191,7 @@ def startsinglegame():
             score = score
     # if request.method == "POST":
     #     i = None
-    return render_template("game.html", question=question, answers = answers)
+    return render_template("game.html", question=question, answers = answers, score = score)
 
 
 def errorhandler(e):
