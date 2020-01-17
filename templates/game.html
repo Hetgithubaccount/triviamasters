@@ -1,12 +1,13 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    wacht
+    Game
 {% endblock %}
 
 {% block main %}
-     <button class="btn btn-primary" type="submit">Start spel</button>
-     <button class="btn btn-primary" type="submit">Start spel</button>
-     <button class="btn btn-primary" type="submit">Start spel</button>
-     <button class="btn btn-primary" type="submit">Start spel</button>
+    <h3 id="question">{{ question }}</h3>
+    <button class="btn btn-primary" type="submit">{{ answer 1 }}</button>
+    <button class="btn btn-primary" type="submit">Start spel</button>
+    <button class="btn btn-primary" type="submit">Start spel</button>
+    <button class="btn btn-primary" type="submit">Start spel</button>
 {% endblock %}
