@@ -182,6 +182,7 @@ def wacht():
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
     score = 0
+    vraag = 0
     quest = newquestion()
     question = quest[0]
     coranswer = quest[1]
@@ -193,6 +194,9 @@ def startsinglegame():
         if ingevuld == coranswer:
             score += 1
             print(score)
+        vraag += 1
+        if vraag == 10:
+            return render_template("eind.html")
         quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
@@ -216,6 +220,7 @@ def newquestion():
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
     return render_template("eind.html")
+
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
