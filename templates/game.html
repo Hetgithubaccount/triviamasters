@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-     <H2 class = "question"> {{question}}</H2>
+     <h2 id= "category"> Category: {{categ}}</h2>
+     <H2 class = "question"> Question: {{question}}</H2>
      <form action="/game" method="post">
      <div>
      {%for option in answerlist%}
