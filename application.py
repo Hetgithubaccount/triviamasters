@@ -187,6 +187,7 @@ def startsinglegame():
     question = quest[0]
     coranswer = quest[1]
     answerlist = quest[2]
+    categ = quest[3]
     print(vraag)
     if request.method == "POST":
         ingevuld = str(request.form.get("answer"))
@@ -203,21 +204,23 @@ def startsinglegame():
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
+        categ = quest[3]
 
-        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer)
+        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
     else:
-        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer)
+        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
 
 def newquestion():
     with open('questions.csv', newline='') as csv_file:
             reader = list(csv.reader(csv_file))    # nieuwe vraag
             sequence = random.choice(reader)
+            category = sequence[0]
             question = sequence[3]
             coranswer = sequence[4]
             print(coranswer)
             answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
-    return [question, coranswer, answerlist]
+    return [question, coranswer, answerlist, category]
 
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
