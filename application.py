@@ -196,7 +196,8 @@ def startsinglegame():
             print(score)
         vraag += 1
         if vraag == 10:
-            return render_template("eind.html")
+            vraag = 0
+            return render_template("eind.html", score=score)
         quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
@@ -219,7 +220,10 @@ def newquestion():
 
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
-    return render_template("eind.html")
+    if request.method == "POST":
+        return render_template("game.html")
+    else:
+        return render_template("eind.html")
 
 def errorhandler(e):
     """Handle error"""
