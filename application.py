@@ -187,7 +187,7 @@ def startsinglegame():
     question = quest[0]
     coranswer = quest[1]
     answerlist = quest[2]
-
+    print(vraag)
     if request.method == "POST":
         ingevuld = str(request.form.get("answer"))
         print(ingevuld)
@@ -198,6 +198,7 @@ def startsinglegame():
         if vraag == 10:
             vraag = 0
             return render_template("eind.html", score=score)
+        print(vraag)
         quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
