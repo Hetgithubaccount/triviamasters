@@ -230,7 +230,8 @@ def vragen():
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
     if request.method == "POST":
-        return render_template("game.html")
+        session.clear()
+        return redirect("/")
     else:
         return render_template("eind.html")
 
