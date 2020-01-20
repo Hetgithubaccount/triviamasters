@@ -190,23 +190,20 @@ def startsinglegame():
     coranswer = quest[1]
     answerlist = quest[2]
     categ = quest[3]
+
     if request.method == "POST":
         ingevuld = str(request.form.get("answer"))
-        print(ingevuld)
+        print(ingevuld, coranswer)
         if ingevuld == coranswer:
             score += 1
-            print(score)
+            # print(score)
         vraag += 1
-        print(vraag)
+        # print(vraag)
         if vraag == 10:
             vraag = 0
             return render_template("eind.html", score=score)
-        print(vraag)
-        quest = newquestion()
-        question = quest[0]
-        coranswer = quest[1]
-        answerlist = quest[2]
-        categ = quest[3]
+            # print(vraag)
+
 
         return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
     else:
@@ -220,8 +217,9 @@ def newquestion():
             category = sequence[0]
             question = sequence[3]
             coranswer = sequence[4]
-            print(coranswer)
+            # print(coranswer)
             answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
+            # print("test", [question, coranswer, answerlist, category])
     return [question, coranswer, answerlist, category]
 
 def vragen():
