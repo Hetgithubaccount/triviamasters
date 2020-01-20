@@ -183,15 +183,14 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-    vraag = 0
-    score = 0
     quest = newquestion()
     question = quest[0]
     coranswer = quest[1]
     answerlist = quest[2]
     categ = quest[3]
-
     if request.method == "POST":
+        vraag = 0
+        score = 0
         ingevuld = str(request.form.get("answer"))
     print(ingevuld, coranswer)
     if ingevuld == coranswer:
