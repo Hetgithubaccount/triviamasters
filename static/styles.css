@@ -12,6 +12,11 @@
     margin-left: 0;
     font-family: "Arial";
 }
+form {
+    background-color: white;
+    opacity: 0.8;
+    padding: 50px 0px;
+}
 .btn btn-primary{
     margin-left: 0;
     font-family: "Arial";
