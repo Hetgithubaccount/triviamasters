@@ -43,7 +43,7 @@ games = list()
 singlegameplayers = dict()
 
 
-
+print()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
