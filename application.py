@@ -139,6 +139,8 @@ def logout():
 
 @app.route("/", methods=["GET", "POST"])
 def start():
+    session["score"] = 0
+    session["vraag"] = 0
     if request.method == "POST":
         if request.form.get("singleplayer"):
             return render_template("game.html")
@@ -184,35 +186,26 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-    vraag = 0
-    score = 0
-
     if request.method == "GET":
         quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
         categ = quest[3]
-        print(question, coranswer)
         session["coranswer"] = coranswer
-        return render_template("game.html",  score=score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+        return render_template("game.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
     if request.method == "POST":
-        print("POST!!")
-        print(session["coranswer"])
         ingevuld = str(request.form.get("answer"))
-        print(ingevuld, "testtestts")
         if ingevuld == session["coranswer"]:
-            score += 1
-            print(score)
-        else:
-            print("FOUT!!")
-
-        vraag += 1
+            session["score"] += 1
+            print("goed")
+        session["vraag"] += 1
         # print(vraag)
-        if vraag == 10:
-            vraag = 0
-            return render_template("eind.html", score=score)
+        if session["vraag"] == 10:
+            session["vraag"] = 0
+            return render_template("eind.html")
+        print(session["score"])
         # print(vraag)
 
         return redirect("/game")
