@@ -153,7 +153,7 @@ def start():
                     singlegameplayers[request.form.get("username")] = code
                     newgame = False
 
-            return render_template("wacht.html", code= code, username=request.form.get("username"))
+            return render_template("wacht.html", code= code, username=request.form.get("username"), games=games)
     else:
         return render_template("index.html")
 
@@ -161,6 +161,7 @@ def start():
 def join():
     if request.form.get("opponent") and request.form.get("number"):
         code = request.form.get("number")
+        print(games)
         if code in games:
             singlegameplayers[request.form.get("opponent")] = code
             return render_template("game.html")
