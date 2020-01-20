@@ -43,7 +43,7 @@ games = list()
 singlegameplayers = dict()
 
 
-
+print()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -183,30 +183,43 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
-    quest = newquestion()
-    question = quest[0]
-    coranswer = quest[1]
-    answerlist = quest[2]
-    categ = quest[3]
+    vraag = 0
+    score = 0
+
+
+    if request.method == "GET":
+        quest = newquestion()
+        question = quest[0]
+        coranswer = quest[1]
+        answerlist = quest[2]
+        categ = quest[3]
+        print(question, coranswer)
+        session["coranswer"] = coranswer
+        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+
     if request.method == "POST":
-        vraag = 0
-        score = 0
+        print("POST!!")
+        # question = quest[0]
+        # coranswer = quest[1]
+        # answerlist = quest[2]
+        # categ = quest[3]
+        print(session["coranswer"])
         ingevuld = str(request.form.get("answer"))
-    print(ingevuld, coranswer)
-    if ingevuld == coranswer:
-        score += 1
-        # print(score)
-    vraag += 1
-    # print(vraag)
-    if vraag == 10:
-        vraag = 0
-        return render_template("eind.html", score=score)
+        print(ingevuld, "testtestts")
+        if ingevuld == session["coranswer"]:
+            score += 1
+            # print(score)
+        else:
+            print("FOUT!!")
+
+        vraag += 1
+        # print(vraag)
+        if vraag == 10:
+            vraag = 0
+            return render_template("eind.html", score=score)
         # print(vraag)
 
-
-        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
-    else:
-        return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+        return redirect("/game")
 
 
 def newquestion():
