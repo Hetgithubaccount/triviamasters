@@ -193,19 +193,24 @@ def startsinglegame():
         coranswer = quest[1]
         answerlist = quest[2]
         categ = quest[3]
-        print(coranswer)
+        print(question, coranswer)
+        session["coranswer"] = coranswer
         return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
     if request.method == "POST":
-        question = quest[0]
-        coranswer = quest[1]
-        answerlist = quest[2]
-        categ = quest[3]
+        print("POST!!")
+        # question = quest[0]
+        # coranswer = quest[1]
+        # answerlist = quest[2]
+        # categ = quest[3]
+        print(session["coranswer"])
         ingevuld = str(request.form.get("answer"))
-
-        if ingevuld == coranswer:
+        print(ingevuld, "testtestts")
+        if ingevuld == session["coranswer"]:
             score += 1
             # print(score)
+        else:
+            print("FOUT!!")
 
         vraag += 1
         # print(vraag)
@@ -214,7 +219,7 @@ def startsinglegame():
             return render_template("eind.html", score=score)
         # print(vraag)
 
-        return redirect("game.html")
+        return redirect("/game")
 
 
 def newquestion():
