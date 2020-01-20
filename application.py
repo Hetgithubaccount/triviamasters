@@ -182,6 +182,7 @@ def wacht():
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
+    vraag = 0
     score = 0
     quest = newquestion()
     question = quest[0]
@@ -189,7 +190,6 @@ def startsinglegame():
     answerlist = quest[2]
     categ = quest[3]
     if request.method == "POST":
-        vraag = 0
         ingevuld = str(request.form.get("answer"))
         print(ingevuld)
         if ingevuld == coranswer:
@@ -236,6 +236,8 @@ def errorhandler(e):
         e = InternalServerError()
     return apology(e.name, e.code)
 
-
+@app.route("/userpage", methods=["GET", "POST"])
+def userpage():
+    return render_template("userpage.html")
 
 
