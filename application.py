@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import random
 import sqlite3
 import csv
+import requests
 
 from helpers import apology, login_required
 import json
@@ -222,6 +223,10 @@ def newquestion():
             print(coranswer)
             answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
     return [question, coranswer, answerlist, category]
+
+def vragen():
+    response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
+    sport = response.json()
 
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
