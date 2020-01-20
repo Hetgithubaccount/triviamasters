@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    userpage
+{% endblock %}
+
+{% block main %}
+<div>
+<h4>to play: (show games)</h4>
+</div>
+<!-- bootstrap: https://getbootstrap.com/docs/4.4/content/tables/  -->
+<h4> Ranking</h4>
+<table class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Username</th>
+      <th scope="col">Highscore</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Luuk</td>
+      <td>130</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Max</td>
+      <td>129</td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}

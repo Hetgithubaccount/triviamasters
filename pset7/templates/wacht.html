@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    wacht
+{% endblock %}
+
+{% block main %}
+    <form action="/wacht" method="post">
+    <h3 id="code">{{ code}} </h3>
+        <div class="loader"></div>
+    </form>
+{% endblock %}
