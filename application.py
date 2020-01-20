@@ -193,16 +193,16 @@ def startsinglegame():
 
     if request.method == "POST":
         ingevuld = str(request.form.get("answer"))
-        print(ingevuld, coranswer)
-        if ingevuld == coranswer:
-            score += 1
-            # print(score)
-        vraag += 1
+    print(ingevuld, coranswer)
+    if ingevuld == coranswer:
+        score += 1
+        # print(score)
+    vraag += 1
+    # print(vraag)
+    if vraag == 10:
+        vraag = 0
+        return render_template("eind.html", score=score)
         # print(vraag)
-        if vraag == 10:
-            vraag = 0
-            return render_template("eind.html", score=score)
-            # print(vraag)
 
 
         return render_template("game.html",  score = score, question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
