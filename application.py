@@ -142,6 +142,9 @@ def logout():
 def findfriends():
     if request.method == "POST":
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
         portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
 
         return render_template("friends.html", portfolio_contents = portfolio_contents)
@@ -153,6 +156,9 @@ def addfriend():
     if request.method == "POST":
         friendname = request.form.get("addusername")
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lost = 0)
         return render_template("friends.html")
@@ -164,6 +170,9 @@ def delfriend():
     if request.method == "POST":
         friendname = request.form.get("delusername")
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
 
         return render_template("friends.html")
