@@ -288,10 +288,6 @@ def userpage():
 @login_required
 def gamewfriend():
     if request.method == "POST":
-         @app.route("/play", methods=["GET", "POST"])
-@login_required
-def gamewfriend():
-    if request.method == "POST":
         opponent = request.form.get("f-opponent")
         if not opponent:
              return apology("must insert friends username", 403)
