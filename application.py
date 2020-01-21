@@ -169,6 +169,7 @@ def delfriend():
         return render_template("friends.html")
     else:
         return render_template("friends.html")
+
 @app.route("/", methods=["GET", "POST"])
 def start():
     session["score"] = 0
