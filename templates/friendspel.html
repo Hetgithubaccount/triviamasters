@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    fspel
+{% endblock %}
+
+{% block main %}
+<field>
+          <h3> ronde: {{round}}</h3>
+          <h2 id= "category"> Category: {{categ}}</h2>
+          <H2 class = "question" style="font-weight:bold;"> Question: {{question}}</H2>
+          <form action="/fspel" method="post">
+          <div>
+          {%for option in answerlist%}
+          <button class="btn default" name="answer" type="submit" value="{{ option}}">{{option}}</button>
+          {%endfor%}
+          </div>
+          </form>
+          {{ session["score"]}}
+     </field>
+{% endblock %}
