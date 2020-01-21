@@ -314,3 +314,30 @@ def gamewfriend():
         return render_template("userpage.html")
     else:
         return render_template("gamewfriend.html")
+
+@app.route("/fspel", methods=["GET", "POST"])
+@login_required
+def fspel():
+    if request.method == "GET":
+        quest = newquestion()
+        question = quest[0]
+        coranswer = quest[1]
+        answerlist = quest[2]
+        categ = quest[3]
+        session["coranswer"] = coranswer
+        return render_template("game.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+
+    if request.method == "POST":
+        ingevuld = str(request.form.get("answer"))
+        if ingevuld == session["coranswer"]:
+            session["score"] += 1
+            print("goed")
+        session["vraag"] += 1
+        # print(vraag)
+        if session["vraag"] == 10:
+            session["vraag"] = 0
+            return render_template("eind.html")
+        print(session["score"])
+        # print(vraag)
+
+        return redirect("/fspel")
