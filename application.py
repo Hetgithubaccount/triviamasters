@@ -198,9 +198,9 @@ def start():
                 if not result:
                     db.execute("INSERT INTO spel (spelid, username, ronde) VALUES (:spelid, :username, :ronde", spelid=code, username=request.form.get("username"), ronde=1)
                     session["gameid"] = code
-                    newgame = False
+                    return render_template("wacht.html", code=code, username=request.form.get("username"))
 
-            return render_template("wacht.html", code= code, username=request.form.get("username"), games=games)
+
     else:
         return render_template("index.html")
 
