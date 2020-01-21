@@ -5,14 +5,16 @@
 {% endblock %}
 
 {% block main %}
-     <h2 id= "category"> Category: {{categ}}</h2>
-     <H2 class = "question"> Question: {{question}}</H2>
-     <form action="/game" method="post">
-     <div>
-     {%for option in answerlist%}
-     <button class="btn default" name="answer" type="submit" value="{{ option}}">{{option}}</button>
-     {%endfor%}
-     </div>
-     </form>
-     {{ session["score"]}}
+     <field>
+          <h2 id= "category"> Category: {{categ}}</h2>
+          <H2 class = "question"> Question: {{question}}</H2>
+          <form action="/game" method="post">
+          <div>
+          {%for option in answerlist%}
+          <button class="btn default" name="answer" type="submit" value="{{ option}}">{{option}}</button>
+          {%endfor%}
+          </div>
+          </form>
+          {{ session["score"]}}
+     </field>
 {% endblock %}

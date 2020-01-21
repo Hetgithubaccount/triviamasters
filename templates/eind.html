@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block main %}
-<h2> Gefeliciteerd!!</h2>
-<h3> Uw eindscore is: {{ session["score"]}}</h3>
-<form action="/eind" method="post">
-    <button class="btn default" name="terug" type="submit"> Terug naar homepage </button>
-</form>
+    <field>
+        <h2> Gefeliciteerd!!</h2>
+        <h3> Uw eindscore is: {{ session["score"]}}</h3>
+        <form action="/eind" method="post">
+            <button class="btn default" name="terug" type="submit"> Terug naar homepage </button>
+        </form>
+    </field>
 {% endblock %}
