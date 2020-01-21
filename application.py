@@ -142,6 +142,9 @@ def logout():
 def findfriends():
     if request.method == "POST":
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
         portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
 
         return render_template("friends.html", portfolio_contents = portfolio_contents)
@@ -153,6 +156,9 @@ def addfriend():
     if request.method == "POST":
         friendname = request.form.get("addusername")
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lost = 0)
         return render_template("friends.html")
@@ -164,11 +170,15 @@ def delfriend():
     if request.method == "POST":
         friendname = request.form.get("delusername")
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
 
         return render_template("friends.html")
     else:
         return render_template("friends.html")
+
 @app.route("/", methods=["GET", "POST"])
 def start():
     session["score"] = 0
@@ -285,15 +295,19 @@ def userpage():
     else:
         return render_template("userpage.html")
 
-@app.route("/gamewfriend", methods=["GET", "POST"])
+@app.route("/play", methods=["GET", "POST"])
 @login_required
 def gamewfriend():
     if request.method == "POST":
         opponent = request.form.get("f-opponent")
         if not opponent:
              return apology("must insert friends username", 403)
-             id = session["user_id"]
-             username = db.execute("SELECT username FROM users WHERE id = : id", id=id)
+        id = session["user_id"]
+        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
+        for i in username:
+            for name in i:
+                username = i[name]
+        print(username)
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
         if not friend:
@@ -301,3 +315,30 @@ def gamewfriend():
         return render_template("userpage.html")
     else:
         return render_template("gamewfriend.html")
+
+@app.route("/fspel", methods=["GET", "POST"])
+@login_required
+def fspel():
+    if request.method == "GET":
+        quest = newquestion()
+        question = quest[0]
+        coranswer = quest[1]
+        answerlist = quest[2]
+        categ = quest[3]
+        session["coranswer"] = coranswer
+        return render_template("game.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+
+    if request.method == "POST":
+        ingevuld = str(request.form.get("answer"))
+        if ingevuld == session["coranswer"]:
+            session["score"] += 1
+            print("goed")
+        session["vraag"] += 1
+        # print(vraag)
+        if session["vraag"] == 10:
+            session["vraag"] = 0
+            return render_template("eind.html")
+        print(session["score"])
+        # print(vraag)
+
+        return redirect("/fspel")
