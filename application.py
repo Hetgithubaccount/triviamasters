@@ -246,6 +246,11 @@ def errorhandler(e):
 @app.route("/userpage", methods=["GET", "POST"])
 @login_required
 def userpage():
-    return render_template("userpage.html")
+    if request.method == "POST":
+        return redirect("game.html")
+    else:
+        userid = session["user_id"]
+        username = db.execute("SELECT username FROM users WHERE user_id=:userid", userid=userid)
+        return render_template("userpage.html")
 
 
