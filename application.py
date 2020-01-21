@@ -76,7 +76,7 @@ def register():
                              username=request.form.get("username"), \
                              hash=generate_password_hash(request.form.get("password")))
 
-        return redirect("userpage.html")
+        return render_template("userpage.html")
 
     else:
         return render_template("register.html")
@@ -122,7 +122,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return redirect("userpage.html")
+        return render_template("userpage.html")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -246,6 +246,9 @@ def errorhandler(e):
 @app.route("/userpage", methods=["GET", "POST"])
 @login_required
 def userpage():
-    return render_template("userpage.html")
+    if request.method == "POST":
+        return render_template("userpage.html")
+    else:
+        return render_template("userpage.html")
 
 
