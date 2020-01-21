@@ -160,7 +160,7 @@ def addfriend():
             for name in i:
                 username = i[name]
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose", username = username,
-                                                                                                friend = friendname, games = 0, won = 0, lost = 0)
+                                                                                                friend = friendname, games = 0, won = 0, lose = 0)
         return render_template("friends.html")
     else:
         return render_template("friends.html")
