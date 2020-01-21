@@ -184,9 +184,10 @@ def start():
             newgame = True
             while newgame:
                 code = random.randrange(100000, 999999)
-                if code not in games:
-                    games.append(code)
-                    singlegameplayers[request.form.get("username")] = code
+                result = db.execute("SELECT * FROM spel WHERE spelid=:code", code=code)
+                if not result:
+                    db.execute("INSERT INTO spel (spelid, username, ronde) VALUES (:spelid, :username, :ronde", spelid=code, username=request.form.get("username"), ronde=1)
+                    session["gameid"] = code
                     newgame = False
 
             return render_template("wacht.html", code= code, username=request.form.get("username"), games=games)
@@ -197,9 +198,9 @@ def start():
 def join():
     if request.form.get("opponent") and request.form.get("number"):
         code = request.form.get("number")
-        print(games)
-        if code in games:
-            singlegameplayers[request.form.get("opponent")] = code
+        result = db.execute("SELECT * FROM spel WHERE gameid=:gameid", gameid=code)
+        if result:
+            db.execute("UPDATE spel SET opponent=:opponent WHERE gameid=:code", opponent=request.form.get("opponent"), code=code)
             return render_template("game.html")
         else:
             return apology("enter valid code", 403)
@@ -210,9 +211,9 @@ def join():
 def wacht():
     opponent = None
     while opponent == None:
-        for i in singlegameplayers:
-            if singlegameplayers[i] == code and i != username:
-                return render_template("game.html")
+        result = db.execute("SELECT opponent FROM spel WHERE gameid:=gameid", gameid=session["gameid"])
+        if result:
+            return render_template("game.html")
 
         time.sleep(10)
 
