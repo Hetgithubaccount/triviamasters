@@ -298,6 +298,8 @@ def userpage():
 @app.route("/play", methods=["GET", "POST"])
 @login_required
 def gamewfriend():
+    session["score"] = 0
+    session["vraag"] = 0
     if request.method == "POST":
         opponent = request.form.get("f-opponent")
         if not opponent:
@@ -312,11 +314,12 @@ def gamewfriend():
                           username=username)
         if not friend:
              return apology("must add opponent as friend", 403)
-        return render_template("userpage.html")
+        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën", username=username, opponent=opponent, ronde=1,score_1=0,score_2=0, categorieën=""))
+        return render_template("friendspel.html")
     else:
         return render_template("gamewfriend.html")
 
-@app.route("/fspel", methods=["GET", "POST"])
+@app.route("/spel", methods=["GET", "POST"])
 @login_required
 def fspel():
     if request.method == "GET":
@@ -326,7 +329,7 @@ def fspel():
         answerlist = quest[2]
         categ = quest[3]
         session["coranswer"] = coranswer
-        return render_template("game.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+        return render_template("friendspel.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
     if request.method == "POST":
         ingevuld = str(request.form.get("answer"))
@@ -337,8 +340,8 @@ def fspel():
         # print(vraag)
         if session["vraag"] == 10:
             session["vraag"] = 0
-            return render_template("eind.html")
+            return render_template("userpage.html")
         print(session["score"])
         # print(vraag)
 
-        return redirect("/fspel")
+        return redirect("/spel")
