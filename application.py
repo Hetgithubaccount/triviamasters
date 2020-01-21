@@ -158,6 +158,17 @@ def addfriend():
         return render_template("friends.html")
     else:
         return render_template("friends.html")
+
+@app.route("/delfriend", methods=["GET", "POST"])
+def delfriend():
+    if request.method == "POST":
+        friendname = request.form.get("delusername")
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
+
+        return render_template("friends.html")
+    else:
+        return render_template("friends.html")
 @app.route("/", methods=["GET", "POST"])
 def start():
     session["score"] = 0
