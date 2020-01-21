@@ -138,6 +138,26 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+@app.route("/friends", methods=["GET", "POST"])
+def findfriends():
+    if request.method == "POST":
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
+
+        return render_template("friends.html", portfolio_contents = portfolio_contents)
+     else:
+        return render_template("friends.html")
+
+@app.route("/addfriend", methods=["GET", "POST"])
+def addfriend():
+    if request.method == "POST":
+        friendname = request.form.get("addusername")
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose", username = username
+                                                                                                friend = friendname, games = 0, won = 0, lost = 0)
+        return render_template("friends.html")
+    else:
+        return render_template("friends.html")
 @app.route("/", methods=["GET", "POST"])
 def start():
     session["score"] = 0
