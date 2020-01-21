@@ -251,4 +251,10 @@ def userpage():
     else:
         return render_template("userpage.html")
 
-
+@app.route("/gamewfriend", methods=["GET", "POST"])
+@login_required
+def gamewfriend():
+    if request.method == "POST":
+         return render_template("userpage.html")
+    else:
+        return render_template("gamewfriend.html")
