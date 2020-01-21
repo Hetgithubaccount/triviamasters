@@ -76,7 +76,7 @@ def register():
                              username=request.form.get("username"), \
                              hash=generate_password_hash(request.form.get("password")))
 
-        return redirect("game.html")
+        return redirect("userpage.html")
 
     else:
         return render_template("register.html")
@@ -136,7 +136,7 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("start.html")
+    return redirect("/")
 
 @app.route("/", methods=["GET", "POST"])
 def start():
