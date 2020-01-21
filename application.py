@@ -76,7 +76,7 @@ def register():
                              username=request.form.get("username"), \
                              hash=generate_password_hash(request.form.get("password")))
 
-        return redirect("game.html")
+        return render_template("userpage.html")
 
     else:
         return render_template("register.html")
@@ -122,7 +122,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return redirect("userpage.html")
+        return render_template("userpage.html")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -136,7 +136,7 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("start.html")
+    return redirect("/")
 
 @app.route("/", methods=["GET", "POST"])
 def start():
@@ -249,8 +249,6 @@ def userpage():
     if request.method == "POST":
         return redirect("game.html")
     else:
-        userid = session["user_id"]
-        username = db.execute("SELECT username FROM users WHERE user_id=:userid", userid=userid)
         return render_template("userpage.html")
 
 
