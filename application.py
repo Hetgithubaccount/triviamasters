@@ -284,15 +284,19 @@ def userpage():
     else:
         return render_template("userpage.html")
 
-@app.route("/gamewfriend", methods=["GET", "POST"])
+@app.route("/play", methods=["GET", "POST"])
 @login_required
 def gamewfriend():
     if request.method == "POST":
         opponent = request.form.get("f-opponent")
         if not opponent:
              return apology("must insert friends username", 403)
-             id = session["user_id"]
-             username = db.execute("SELECT username FROM users WHERE id = : id", id=id)
+        id = session["user_id"]
+        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
+        for i in username:
+            for name in i:
+                username = i[name]
+        print(username)
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
         if not friend:
