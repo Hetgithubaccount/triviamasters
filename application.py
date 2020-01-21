@@ -192,6 +192,8 @@ def join():
             return render_template("game.html")
         else:
             return apology("enter valid code", 403)
+    else:
+        return render_template("index.html")
 
 @app.route("/wacht", methods=["GET", "POST"])
 def wacht():
