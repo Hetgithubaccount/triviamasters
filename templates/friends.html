@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Friends
+{% endblock %}
+
+{% block main %}
+    <field>
+        <table style="width:100%">
+          <tr>
+            <th>Name</th>
+            <th>Games won</th>
+            <th>Games lost</th>
+          </tr>
+            {% for info in portfolio_contents %}
+              <tr>
+                <td>{{ info.friend }}</td>
+                <td>{{ info.won }}</td>
+                <td>{{ info.lose }}</td>
+              </tr>
+            {% endfor %}
+        </table>
+        <h3>Add friend</h3>
+        <form action="/addfriend" method="post">
+            <div class="form-start">
+                <input autocomplete="off" autofocus class="form-start" name="addusername" placeholder="Username" type="text">
+            </div>
+            <button class="btn btn-primary" class= "form-start" name="addfriend" type="submit">Add</button>
+        </form>
+        <h3>Get rid of friend</h3>
+        <form action="/delfriend" method="post">
+            <div class="form-start">
+                <input autocomplete="off" autofocus class="form-start" name="delusername" placeholder="Username" type="text">
+            </div>
+            <button class="btn btn-primary" class= "form-start" name="delfriend" type="submit">Cya</button>
+        </form>
+    </field>
+{% endblock %}
