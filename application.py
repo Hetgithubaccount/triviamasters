@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from cs50 import SQL
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
@@ -301,6 +301,7 @@ def gamewfriend():
     session["score"] = 0
     session["vraag"] = 0
     if request.method == "POST":
+        print("hi")
         opponent = request.form.get("f-opponent")
         if not opponent:
              return apology("must insert friends username", 403)
@@ -313,9 +314,10 @@ def gamewfriend():
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
         if not friend:
+             print("hi")
              return apology("must add opponent as friend", 403)
         db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën", username=username, opponent=opponent, ronde=1,score_1=0,score_2=0, categorieën="")
-        return render_template("friendspel.html")
+        return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
 
