@@ -146,7 +146,7 @@ def findfriends():
             for name in i:
                 username = i[name]
         portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
-        print(portfolio_contents)
+        portfolio_contents = portfolio_contents + db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
         return render_template("friends.html")
