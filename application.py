@@ -122,7 +122,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return render_template("userpage.html")
+        return redirect("/userpage")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -145,8 +145,14 @@ def findfriends():
         for i in username:
             for name in i:
                 username = i[name]
-        portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
-        portfolio_contents = portfolio_contents + db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
+        ownfriends = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
+        reversefriends = db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
+        # Wisselt volgorde in lijst, zodat vriend wordt getoond op pagina ipv jouw eigen naam
+        for i in reversefriends:
+            dude = i["username"]
+            i["username"] = i["friend"]
+            i["friend"] = dude
+        portfolio_contents = ownfriends + reversefriends
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
         return render_template("friends.html")
@@ -155,13 +161,19 @@ def findfriends():
 def addfriend():
     if request.method == "POST":
         friendname = request.form.get("addusername")
+
+        # Checks if username is legit
+        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("addusername"))
+        if not result:
+            return apology("user does not exist", 403)
+
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
                 username = i[name]
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose)", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lose = 0)
-        return render_template("friends.html")
+        return redirect("/friends")
     else:
         return render_template("friends.html")
 
@@ -169,13 +181,19 @@ def addfriend():
 def delfriend():
     if request.method == "POST":
         friendname = request.form.get("delusername")
+
+        # Checks if username is legit
+        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("delusername"))
+        if not result:
+            return apology("user does not exist", 403)
+
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
                 username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
 
-        return render_template("friends.html")
+        return redirect("/friends")
     else:
         return render_template("friends.html")
 
@@ -299,9 +317,17 @@ def errorhandler(e):
 @app.route("/userpage", methods=["GET", "POST"])
 @login_required
 def userpage():
-    if request.method == "POST":
-        return redirect("/game")
+    if request.method == "GET":
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
+        spellenlijst = []
+        spel = db.execute("SELECT opponent FROM spel WHERE opponent= :username", username=username)
+        print(spel, "test")
+        return render_template("userpage.html")
     else:
+        print("test2")
         return render_template("userpage.html")
 
 @app.route("/play", methods=["GET", "POST"])
@@ -325,7 +351,11 @@ def gamewfriend():
         if not friend:
              print("hi")
              return apology("must add opponent as friend", 403)
-        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën", username=username, opponent=opponent, ronde=1,score_1=0,score_2=0, categorieën="")
+        ronde = 1
+        score_1 = 0
+        score_2 = 0
+        categorieën = ""
+        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
         return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
@@ -356,3 +386,11 @@ def fspel():
         # print(vraag)
 
         return redirect("/spel")
+
+@app.route("/leaderboards", methods=["GET", "POST"])
+@login_required
+def leaderbords():
+    if request.method == "POST":
+        return render_template("leaderboards.html")
+    else:
+        return render_template("leaderboards.html")
