@@ -214,7 +214,7 @@ def start():
                 code = random.randrange(100000, 999999)
                 result = db.execute("SELECT * FROM spel WHERE spelid=:code", code=code)
                 if not result:
-                    db.execute("INSERT INTO spel (spelid, username, ronde) VALUES (:spelid, :username, :ronde", spelid=code, username=request.form.get("username"), ronde=1)
+                    db.execute("INSERT INTO spel (spelid, username, opponent, ronde, categorieën, score_1, score_2) VALUES (:spelid, :username, :opponent, :ronde, :categorieën, :score_1, :score_2)", spelid=code, username=request.form.get("username"), opponent="", ronde=1, categorieën="", score_1=0, score_2=0)
                     session["gameid"] = code
                     return render_template("wacht.html", code=code, username=request.form.get("username"))
 
@@ -224,28 +224,37 @@ def start():
 
 @app.route("/join", methods=["GET", "POST"])
 def join():
-    if request.form.get("opponent") and request.form.get("number"):
-        code = request.form.get("number")
-        result = db.execute("SELECT * FROM spel WHERE gameid=:gameid", gameid=code)
-        if result:
-            db.execute("UPDATE spel SET opponent=:opponent WHERE gameid=:code", opponent=request.form.get("opponent"), code=code)
-            return render_template("game.html")
+    if request.method == "POST":
+        if request.form.get("opponent") and request.form.get("number"):
+            code = request.form.get("number")
+            result = db.execute("SELECT * FROM spel WHERE spelid=:code", code=code)
+            print(result)
+            if result:
+                if result[0]["opponent"] == "":
+                    db.execute("UPDATE spel SET opponent=:opponent WHERE spelid=:code", opponent=request.form.get("opponent"), code=code)
+                    return render_template("game.html")
+                else:
+                    return apology("already 2 players in game", 403)
+            else:
+                return apology("enter valid code", 403)
         else:
-            return apology("enter valid code", 403)
+            return render_template("index.html")
     else:
         return render_template("index.html")
 
 @app.route("/wacht", methods=["GET", "POST"])
 def wacht():
-    opponent = None
-    while opponent == None:
-        result = db.execute("SELECT opponent FROM spel WHERE gameid:=gameid", gameid=session["gameid"])
-        if result:
-            return render_template("game.html")
+    if request.method == "GET":
+        opponent = False
+        while opponent == False:
+            result = db.execute("SELECT opponent FROM spel WHERE spelid=:gameid", gameid=session["gameid"])
+            if result[0]["opponent"] != "":
+                opponent = True
 
-        time.sleep(10)
-
-    return render_template("wacht.html")
+            time.sleep(.9)
+        return render_template("game.html")
+    else:
+        return render_template("wacht.html")
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
