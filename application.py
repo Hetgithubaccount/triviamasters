@@ -313,12 +313,13 @@ def userpage():
         for i in username:
             for name in i:
                 username = i[name]
+                opponent = i[name]
         spellenlijst = []
-        spel = db.execute("SELECT opponent FROM spel WHERE opponent= :username", username=username)
-        print(spel, "test")
+        spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
+        spel = db.execute("SELECT opponent FROM spel WHERE opponent= :opponent", opponent=opponent)
+        print(spel, spell)
         return render_template("userpage.html")
     else:
-        print("test2")
         return render_template("userpage.html")
 
 @app.route("/play", methods=["GET", "POST"])
