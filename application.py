@@ -122,7 +122,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return render_template("userpage.html")
+        return redirect("/userpage")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -308,10 +308,17 @@ def errorhandler(e):
 @app.route("/userpage", methods=["GET", "POST"])
 @login_required
 def userpage():
-    if request.method == "POST":
-
-        return redirect("game.html")
+    if request.method == "GET":
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+        for i in username:
+            for name in i:
+                username = i[name]
+        spellenlijst = []
+        spel = db.execute("SELECT opponent FROM spel WHERE opponent= :username", username=username)
+        print(spel, "test")
+        return render_template("userpage.html")
     else:
+        print("test2")
         return render_template("userpage.html")
 
 @app.route("/play", methods=["GET", "POST"])
