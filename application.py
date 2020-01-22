@@ -323,11 +323,18 @@ def userpage():
             for name in i:
                 username = i[name]
                 opponent = i[name]
-        spellenlijst = []
+        row = []
         spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
-        spel = db.execute("SELECT opponent FROM spel WHERE opponent= :opponent", opponent=opponent)
+        spel = db.execute("SELECT * FROM spel WHERE opponent= :opponent", opponent=opponent)
         print(spel, spell)
-        return render_template("userpage.html")
+        for i in spell:
+            row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
+        spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
+        session["spelid"] = spelid
+        print(spelid)
+        session["score"] = 0
+        session["vraag"] = 0
+        return render_template("userpage.html", row=row)
     else:
         return render_template("userpage.html")
 
@@ -382,8 +389,19 @@ def fspel():
         # print(vraag)
         if session["vraag"] == 10:
             session["vraag"] = 0
-            return render_template("userpage.html")
-        print(session["score"])
+            spelid = session["spelid"]
+            id = session["user_id"]
+            username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
+            for i in username:
+                for name in i:
+                    username = i[name]
+            score = session["score"]
+            naam = db.execute("SELECT username FROM spel WHERE spelid= : spelid", spelid=spelid)
+            if naam == username:
+                db.execute("UPDATE spel SET ronde += 1, score_1 += :score WHERE spelid = :spelid", score=score, spelid=spelid)
+            else:
+                 db.execute("UPDATE spel SET ronde += 1, score_2 += :score WHERE spelid = :spelid", score=score, spelid=spelid)
+            return redirect("/userpage")
         # print(vraag)
 
         return redirect("/spel")
@@ -395,3 +413,11 @@ def leaderbords():
         return render_template("leaderboards.html")
     else:
         return render_template("leaderboards.html")
+
+@app.route("/about", methods=["GET", "POST"])
+@login_required
+def about():
+    if request.method == "POST":
+        return render_template("about.html")
+    else:
+        return render_template("about.html")
