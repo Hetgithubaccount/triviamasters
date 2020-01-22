@@ -145,8 +145,14 @@ def findfriends():
         for i in username:
             for name in i:
                 username = i[name]
-        portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
-        portfolio_contents = portfolio_contents + db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
+        ownfriends = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
+        reversefriends = db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
+        # Wisselt volgorde in lijst, zodat vriend wordt getoond op pagina ipv jouw eigen naam
+        for i in reversefriends:
+            dude = i["username"]
+            i["username"] = i["friend"]
+            i["friend"] = dude
+        portfolio_contents = ownfriends + reversefriends
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
         return render_template("friends.html")
@@ -155,13 +161,19 @@ def findfriends():
 def addfriend():
     if request.method == "POST":
         friendname = request.form.get("addusername")
+
+        # Checks if username is legit
+        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("addusername"))
+        if not result:
+            return apology("user does not exist", 403)
+
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
                 username = i[name]
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose)", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lose = 0)
-        return render_template("friends.html")
+        return redirect("/friends")
     else:
         return render_template("friends.html")
 
@@ -169,13 +181,19 @@ def addfriend():
 def delfriend():
     if request.method == "POST":
         friendname = request.form.get("delusername")
+
+        # Checks if username is legit
+        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("delusername"))
+        if not result:
+            return apology("user does not exist", 403)
+
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
                 username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
 
-        return render_template("friends.html")
+        return redirect("/friends")
     else:
         return render_template("friends.html")
 
