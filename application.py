@@ -161,6 +161,12 @@ def findfriends():
 def addfriend():
     if request.method == "POST":
         friendname = request.form.get("addusername")
+
+        # Checks if username is legit
+        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("addusername"))
+        if not result:
+            return apology("user does not exist", 403)
+
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
@@ -175,6 +181,12 @@ def addfriend():
 def delfriend():
     if request.method == "POST":
         friendname = request.form.get("delusername")
+
+        # Checks if username is legit
+        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("delusername"))
+        if not result:
+            return apology("user does not exist", 403)
+
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
