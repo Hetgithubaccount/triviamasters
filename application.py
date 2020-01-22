@@ -334,6 +334,7 @@ def userpage():
         print(spelid)
         session["score"] = 0
         session["vraag"] = 0
+        session["streak"] = 0
         return render_template("userpage.html", row=row)
     else:
         return render_template("userpage.html")
@@ -384,9 +385,16 @@ def fspel():
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
-            print("goed")
+            session["streak"] += 1
+        else:
+            session["streak"] = 0
         session["vraag"] += 1
         # print(vraag)
+        if session["streak"] >= 3:
+            session["score"] += 1
+            session["multiply"] = "X2"
+        else:
+            session["multiply"] = "X1"
         if session["vraag"] == 10:
             session["vraag"] = 0
             spelid = session["spelid"]
@@ -403,7 +411,9 @@ def fspel():
                  db.execute("UPDATE spel SET ronde += 1, score_2 += :score WHERE spelid = :spelid", score=score, spelid=spelid)
             return redirect("/userpage")
         # print(vraag)
-
+        # spelid = session["spelid"]
+        # print(spelid)
+        # session["ronde"] = db.execute("SELECT ronde FROM spel WHERE spelid= : spelid", spelid=spelid)
         return redirect("/spel")
 
 @app.route("/leaderboards", methods=["GET", "POST"])
