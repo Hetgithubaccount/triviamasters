@@ -161,7 +161,7 @@ def addfriend():
                 username = i[name]
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose)", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lose = 0)
-        return render_template("friends.html")
+        return redirect("/friends")
     else:
         return render_template("friends.html")
 
@@ -175,7 +175,7 @@ def delfriend():
                 username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
 
-        return render_template("friends.html")
+        return redirect("/friends")
     else:
         return render_template("friends.html")
 
