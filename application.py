@@ -291,6 +291,7 @@ def errorhandler(e):
 @login_required
 def userpage():
     if request.method == "POST":
+
         return redirect("game.html")
     else:
         return render_template("userpage.html")
@@ -351,3 +352,11 @@ def fspel():
         # print(vraag)
 
         return redirect("/spel")
+
+@app.route("/leaderboards", methods=["GET", "POST"])
+@login_required
+def leaderbords():
+    if request.method == "POST":
+        return render_template("leaderboards.html")
+    else:
+        return render_template("leaderboards.html")
