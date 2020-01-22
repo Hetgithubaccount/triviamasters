@@ -140,13 +140,13 @@ def logout():
 
 @app.route("/friends", methods=["GET", "POST"])
 def findfriends():
-    if request.method == "POST":
+    if request.method == "GET":
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
         for i in username:
             for name in i:
                 username = i[name]
         portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
-
+        print(portfolio_contents)
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
         return render_template("friends.html")
@@ -159,7 +159,7 @@ def addfriend():
         for i in username:
             for name in i:
                 username = i[name]
-        db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose", username = username,
+        db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose)", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lose = 0)
         return render_template("friends.html")
     else:
