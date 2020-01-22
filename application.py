@@ -316,7 +316,11 @@ def gamewfriend():
         if not friend:
              print("hi")
              return apology("must add opponent as friend", 403)
-        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën", username=username, opponent=opponent, ronde=1,score_1=0,score_2=0, categorieën="")
+        ronde = 1
+        score_1 = 0
+        score_2 = 0
+        categorieën = ""
+        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
         return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
