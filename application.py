@@ -314,7 +314,7 @@ def gamewfriend():
                           username=username)
         if not friend:
              return apology("must add opponent as friend", 403)
-        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën", username=username, opponent=opponent, ronde=1,score_1=0,score_2=0, categorieën=""))
+        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën", username=username, opponent=opponent, ronde=1,score_1=0,score_2=0, categorieën="")
         return render_template("friendspel.html")
     else:
         return render_template("gamewfriend.html")
