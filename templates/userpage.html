@@ -8,6 +8,29 @@
 <div>
 <h4>to play: (show games)</h4>
 </div>
-<!-- bootstrap: https://getbootstrap.com/docs/4.4/content/tables/  -->
-
+    </field>
+    <field>
+        <table style="width:100%" action="/friends" method="get">
+          <tr>
+            <th>tegenstander</th>
+            <th>ronde</th>
+            <th>jouw score</th>
+            <th>score tegenstander</th>
+            <th>speel verder</th>
+          </tr>
+            {% for data in row %}
+              <tr>
+                  {% for punt in data %}
+                <td>{{ punt }}</td>
+                  {% endfor %}
+                <td>
+                    <form action="/spel" method="get">
+                    <button class="btn default" name="answer" type="submit">speel verder</button>
+                    </form>
+                </td>
+              </tr>
+            {% endfor %}
+        </table>
+    </field>
 {% endblock %}
+
