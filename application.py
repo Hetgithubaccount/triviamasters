@@ -145,8 +145,14 @@ def findfriends():
         for i in username:
             for name in i:
                 username = i[name]
-        portfolio_contents = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
-        portfolio_contents = portfolio_contents + db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
+        ownfriends = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
+        reversefriends = db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
+        # Wisselt volgorde in lijst, zodat vriend wordt getoond op pagina ipv jouw eigen naam
+        for i in reversefriends:
+            dude = i["username"]
+            i["username"] = i["friend"]
+            i["friend"] = dude
+        portfolio_contents = ownfriends + reversefriends
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
         return render_template("friends.html")
