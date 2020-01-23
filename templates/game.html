@@ -11,7 +11,7 @@
           <form action="/game" method="post">
           <div>
           {%for option in answerlist%}
-          <button class="btn default" name="answer" type="submit" value="{{ option}}">{{option | safe}}</button>
+          <button id= "quesbutton" class="btn default" name="answer" type="submit" value="{{ option}}">{{option | safe}}</button>
           {%endfor%}
           </div>
           </form>
