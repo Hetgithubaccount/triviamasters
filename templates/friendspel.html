@@ -12,7 +12,7 @@
           <form action="/spel" method="post">
           <div>
           {%for option in answerlist%}
-          <button class="btn default" name="answer" type="submit" value="{{ option}}">{{option}}</button>
+          <button id="quesbutton" class="btn default" name="answer" type="submit" value="{{ option}}">{{option}}</button>
           {%endfor%}
           </div>
           </form>

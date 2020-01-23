@@ -76,6 +76,25 @@ nav .navbar-brand
     position: fixed;
     right: 80px;
 }
+#quesbutton {
+    margin:auto;
+    margin-bottom: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display:block;
+    padding: 14px 40px;
+    width: 80%;
+    border:2px solid black;
+    background-color: #FFD300;
+    border-radius: 12px;
+}
+#quesbutton:hover {
+  background-color: pink;
+  color: black;
+}
 main .form-control
 {
     /* center form controls */
@@ -120,7 +139,7 @@ score {
   font-weight: normal;
   color: #fff;
   text-transform: uppercase;
-  font-size: 75px;
+  font-size: 60px;
   white-space: nowrap;
   z-index: 1000;
   font-family: 'Bangers', cursive;
@@ -133,7 +152,7 @@ streak {
   font-weight: normal;
   color: #fff;
   text-transform: uppercase;
-  font-size: 75px;
+  font-size:60px;
   white-space: nowrap;
   z-index: 1000;
   font-family: 'Bangers', cursive;
