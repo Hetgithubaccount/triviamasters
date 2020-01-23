@@ -202,6 +202,7 @@ def start():
     session["score"] = 0
     session["vraag"] = 0
     session["streak"] = 0
+    session["multiply"] = "X1"
     if request.method == "POST":
         if request.form.get("singleplayer"):
             return render_template("game.html")
