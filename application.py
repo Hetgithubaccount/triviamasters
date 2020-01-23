@@ -217,7 +217,7 @@ def start():
                     db.execute("INSERT INTO spel (spelid, username, opponent, ronde, categorieën, score_1, score_2) VALUES (:spelid, :username, :opponent, :ronde, :categorieën, :score_1, :score_2)", spelid=code, username=request.form.get("username"), opponent="", ronde=1, categorieën="", score_1=0, score_2=0)
                     session["gameid"] = code
                     session["username"] = request.form.get("username")
-                    return render_template("gamewcode.html")
+                    return redirect("/gamewcode")
 
 
     else:
@@ -262,7 +262,7 @@ def wacht():
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
     if request.method == "GET":
-        quest = vragen()
+        quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
@@ -281,8 +281,6 @@ def startsinglegame():
             session["vraag"] = 0
             return render_template("eind.html")
         print(session["score"])
-        a = vragen()
-        print(a)
         # print(vraag)
 
         return redirect("/game")
@@ -290,7 +288,7 @@ def startsinglegame():
 @app.route("/gamewcode", methods=["GET", "POST"])
 def gamewcode():
     if request.method == "GET":
-        quest = vragen()
+        quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
@@ -329,19 +327,8 @@ def newquestion():
     return [question, coranswer, answerlist, category]
 
 def vragen():
-    apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple", "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple", "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple", "animals": "https://opentdb.com/api.php?amount=49&category=27&type=multiple"}
-    api = random.choice(list(apis.keys()))
-    response = requests.get(apis[api])
+    response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
     sport = response.json()
-    vragen = sport["results"]
-    sequence = random.choice(vragen)
-    category = sequence["category"]
-    question = sequence["question"]
-    coranswer = sequence["correct_answer"]
-    answerlist = sequence["incorrect_answers"]
-    answerlist.append(coranswer)
-    # print(coranswer)
-    return [question, coranswer, answerlist, category]
 
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
@@ -418,7 +405,7 @@ def gamewfriend():
 @login_required
 def fspel():
     if request.method == "GET":
-        quest = vragen()
+        quest = newquestion()
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
