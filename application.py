@@ -374,9 +374,9 @@ def userpage():
         print(spel, spell)
         for i in spell:
             row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
-            idee.append((i["spelid"]))
+            idee.append((i["gameid"]))
         spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
-        session["spelid"] = spelid
+        session["gameid"] = spelid
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
@@ -442,7 +442,7 @@ def fspel():
             session["multiply"] = "X1"
         if session["vraag"] == 10:
             session["vraag"] = 0
-            spelid = session["spelid"]
+            spelid = session["gameid"]
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
             for i in username:
