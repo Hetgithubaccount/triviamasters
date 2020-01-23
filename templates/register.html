@@ -39,6 +39,10 @@
             alert("password must be filled out");
             return false;
           }
+          else if (confirmation == "") {
+            alert("password must be filled out again");
+            return false;
+          }
           else if (password != confirmation) {
             alert("passwords must match");
             return false;
