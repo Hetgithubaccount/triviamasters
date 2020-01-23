@@ -12,12 +12,12 @@
     <field>
         <table style="width:100%" action="/friends" method="get">
           <tr>
-            <th>tegenstander</th>
-            <th>ronde</th>
-            <th>jouw score</th>
-            <th>score tegenstander</th>
-            <th>speel verder</th>
-            <th>verwijder spel</th>
+            <th>Opponent</th>
+            <th>Round</th>
+            <th>Your Score</th>
+            <th>Opponent's Score</th>
+            <th>Play</th>
+            <th>Delete Game</th>
           </tr>
             {% for data in row %}
               <tr>
@@ -26,12 +26,12 @@
                   {% endfor %}
                 <td>
                     <form action="/spel" method="get">
-                    <button class="btn default" name="answer" value= {{spel}} type="submit">start</button>
+                    <button class="btn default" name="answer" value= {{spel}} type="submit">Play</button>
                     </form>
                 </td>
                 <td>
                     <form action="/rspel" method="post">
-                    <button class="btn default" name="answer" type="submit">verwijder</button>
+                    <button class="btn default" name="answer" type="submit">Delete</button>
                     </form>
                 </td>
               </tr>
