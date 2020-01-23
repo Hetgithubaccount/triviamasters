@@ -5,19 +5,60 @@
 {% endblock %}
 
 {% block main %}
-    <field>
-        <form action="/register" method="post">
+    <script>
+        function validateForm() {
+          var username = document.forms["myForm"]["username"].value;
+          if (username == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkusername",
+                data: { "username": username},
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == false){
+                  alert("Name already registered");
+                  return false;
+               }
+          }
+        }
+    </script>
+    <script>
+        function validatepass() {
+          var password = document.forms["myForm"]["password"].value;
+          var confirmation = document.forms["myForm"]["confirmation"].value;
+          if (password == "") {
+            alert("password must be filled out");
+            return false;
+          }
+          else if (password != confirmation) {
+            alert("passwords must match");
+            return false;
+          }
+        }
+    </script>
+        <form name="myForm" onsubmit="return validateForm()" onsubmit="return validatepass()" action="{{ url_for('register') }}" method="post">
             <h3>Register</h3>
             <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+                <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"/>
             </div>
             <div class="form-group">
-                <input class="form-control" name="password" placeholder="Password" type="password">
+                <input class="form-control" name="password" placeholder="Password" type="password"/>
             </div>
             <div class="form-group">
-                <input class="form-control" name="confirmation" placeholder="Confirmation" type="password">
+                <input class="form-control" name="confirmation" placeholder="Password (again)" type="password"/>
             </div>
-            <button class="btn btn-primary" type="submit">Register</button>
+            <div class="form-group">
+                <button class="btn btn-default" type="submit">Register</button>
+            </div>
         </form>
-    </field>
+
 {% endblock %}
