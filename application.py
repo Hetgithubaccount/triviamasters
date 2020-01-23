@@ -290,7 +290,7 @@ def startsinglegame():
 @app.route("/gamewcode", methods=["GET", "POST"])
 def gamewcode():
     if request.method == "GET":
-        quest = newquestion()
+        quest = vragen()
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
