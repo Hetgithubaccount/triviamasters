@@ -81,7 +81,7 @@ def register():
     else:
         return render_template("register.html")
 
-@app.route("/check", methods=["GET"])
+@app.route("/checkusername", methods=["GET"])
 def check():
     """Return true if username available, else false, in JSON format"""
     result = db.execute("SELECT * FROM users \
