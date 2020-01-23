@@ -45,7 +45,7 @@
           }
         }
     </script>
-        <form name="myForm" onsubmit="return validateForm()" onsubmit="return validatepass()" action="{{ url_for('register') }}" method="post">
+        <form name="myForm" onsubmit="return validateForm(), validatepass()" action="{{ url_for('register') }}" method="post">
             <h3>Register</h3>
             <div class="form-group">
                 <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"/>
