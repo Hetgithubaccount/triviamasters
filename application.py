@@ -201,6 +201,7 @@ def delfriend():
 def start():
     session["score"] = 0
     session["vraag"] = 0
+    session["streak"] = 0
     if request.method == "POST":
         if request.form.get("singleplayer"):
             return render_template("game.html")
@@ -218,7 +219,6 @@ def start():
                     session["gameid"] = code
                     session["username"] = request.form.get("username")
                     return redirect("/gamewcode")
-
 
     else:
         return render_template("index.html")
@@ -274,7 +274,13 @@ def startsinglegame():
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
-            print("goed")
+            session["streak"] += 1
+        else:
+            session["streak"] = 0
+        if session["streak"] >= 3:
+            session["score"] += 1
+            session["multiply"] = "X2"
+        else: session["multiply"] = "X1"
         session["vraag"] += 1
         # print(vraag)
         if session["vraag"] == 10:
@@ -363,7 +369,7 @@ def userpage():
             row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
             idee.append((i["spelid"]))
         spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
-        session["spelid"] = spelid
+        session["gameid"] = spelid
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
@@ -429,7 +435,7 @@ def fspel():
             session["multiply"] = "X1"
         if session["vraag"] == 10:
             session["vraag"] = 0
-            spelid = session["spelid"]
+            spelid = session["gameid"]
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
             for i in username:
