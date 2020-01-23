@@ -333,18 +333,19 @@ def userpage():
                 username = i[name]
                 opponent = i[name]
         row = []
+        idee = []
         spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
         spel = db.execute("SELECT * FROM spel WHERE opponent= :opponent", opponent=opponent)
         print(spel, spell)
         for i in spell:
             row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
+            idee.append((i["spelid"]))
         spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
         session["spelid"] = spelid
-        print(spelid)
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
-        return render_template("userpage.html", row=row)
+        return render_template("userpage.html", row=row, idee=idee)
     else:
         return render_template("userpage.html")
 
