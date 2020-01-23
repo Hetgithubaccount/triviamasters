@@ -431,3 +431,9 @@ def about():
         return render_template("about.html")
     else:
         return render_template("about.html")
+
+@app.route("/rspel", methods=["GET", "POST"])
+@login_required
+def rspel():
+    if request.method == "POST":
+        print("test")
