@@ -82,7 +82,7 @@ def register():
         return render_template("register.html")
 
 @app.route("/checkusername", methods=["GET"])
-def check():
+def checkusername():
     """Return true if username available, else false, in JSON format"""
     result = db.execute("SELECT * FROM users \
                             WHERE username=:username", username=request.args.get("username"))
@@ -91,6 +91,15 @@ def check():
     else:
         return jsonify(True)
 
+#@app.route("/checkpassword", methods=["GET"])
+#def checkpassword():
+#    """Return true if passwords match, else false, in JSON format"""
+#    result = db.execute("SELECT * FROM users \
+#                            WHERE username=:username", username=request.args.get("username"))
+#    if len(result) > 0:
+#        return jsonify(False)
+#    else:
+#        return jsonify(True)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
