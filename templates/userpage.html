@@ -17,6 +17,7 @@
             <th>jouw score</th>
             <th>score tegenstander</th>
             <th>speel verder</th>
+            <th>verwijder spel</th>
           </tr>
             {% for data in row %}
               <tr>
@@ -25,7 +26,12 @@
                   {% endfor %}
                 <td>
                     <form action="/spel" method="get">
-                    <button class="btn default" name="answer" type="submit">speel verder</button>
+                    <button class="btn default" name="answer" type="submit">start</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/rspel" method="post">
+                    <button class="btn default" name="answer" type="submit">verwijder</button>
                     </form>
                 </td>
               </tr>
