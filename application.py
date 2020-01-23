@@ -201,6 +201,7 @@ def delfriend():
 def start():
     session["score"] = 0
     session["vraag"] = 0
+    session["streak"] = 0
     if request.method == "POST":
         if request.form.get("singleplayer"):
             return render_template("game.html")
@@ -217,6 +218,7 @@ def start():
                     db.execute("INSERT INTO spel (spelid, username, opponent, ronde, categorieën, score_1, score_2) VALUES (:spelid, :username, :opponent, :ronde, :categorieën, :score_1, :score_2)", spelid=code, username=request.form.get("username"), opponent="", ronde=1, categorieën="", score_1=0, score_2=0)
                     session["gameid"] = code
                     session["username"] = request.form.get("username")
+                    print(session["username"])
                     return render_template("gamewcode.html")
 
 
@@ -274,7 +276,13 @@ def startsinglegame():
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
-            print("goed")
+            session["streak"] += 1
+        else:
+            session["streak"] = 0
+        if session["streak"] >= 3:
+            session["score"] += 1
+            session["multiply"] = "X2"
+        else: session["multiply"] = "X1"
         session["vraag"] += 1
         # print(vraag)
         if session["vraag"] == 10:
