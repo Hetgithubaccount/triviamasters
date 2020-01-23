@@ -374,7 +374,7 @@ def userpage():
         print(spel, spell)
         for i in spell:
             row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
-            idee.append((i["gameid"]))
+            idee.append((i["spelid"]))
         spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
         session["gameid"] = spelid
         session["score"] = 0
