@@ -195,7 +195,7 @@ def delfriend():
             for name in i:
                 username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
-
+        db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = friendname, friendname = username)
         return redirect("/friends")
     else:
         return render_template("friends.html")
@@ -525,5 +525,9 @@ def about():
 @app.route("/rspel", methods=["GET", "POST"])
 @login_required
 def rspel():
-    if request.method == "POST":
-        print("test")
+    if request.method == "GET":
+        spelid = request.form.get("id")
+        db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
+        return redirect("/userpage")
+    else:
+        return render_template("userpage.html")
