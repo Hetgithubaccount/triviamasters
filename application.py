@@ -195,7 +195,7 @@ def delfriend():
             for name in i:
                 username = i[name]
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
-
+        db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = friendname, friendname = username)
         return redirect("/friends")
     else:
         return render_template("friends.html")
