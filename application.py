@@ -516,7 +516,7 @@ def about():
 @app.route("/rspel", methods=["GET", "POST"])
 @login_required
 def rspel():
-    if request.method == "POST":
+    if request.method == "GET":
         spelid = request.form.get("id")
         db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
         return redirect("/userpage")
