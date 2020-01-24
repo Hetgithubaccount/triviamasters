@@ -421,7 +421,6 @@ def gamewfriend():
     session["score"] = 0
     session["vraag"] = 0
     if request.method == "POST":
-        print("hi")
         opponent = request.form.get("f-opponent")
         if not opponent:
              return apology("must insert friends username", 403)
@@ -433,14 +432,17 @@ def gamewfriend():
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
         if not friend:
-             print("hi")
              return apology("must add opponent as friend", 403)
+        gespeeld = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
+        if gespeeld:
+            return apology("you can only play 1 game per friend at the moment", 403)
         ronde = 1
         score_1 = 0
         score_2 = 0
         categorieën = ""
-        a = db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
-        session["spelid"] = a
+        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
+        spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
+        session["spelid"] = spelid[0]["spelid"]
         return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
@@ -449,7 +451,7 @@ def gamewfriend():
 @login_required
 def fspel():
     if request.method == "GET":
-        session["spelid"] = request.args.get("id")
+        # session["spelid"] = request.args.get("id")
         print(session["spelid"], "hier2")
         quest = vragen()
         question = quest[0]
@@ -483,10 +485,12 @@ def fspel():
                 for name in i:
                     username = i[name]
             score = session["score"]
+            print(session["spelid"])
             naam = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)
+            naam = naam[0]["username"]
             if naam == username:
                 score_oud = (db.execute("SELECT score_1 FROM spel WHERE spelid=:spelid", spelid=spelid))
-                score = score + score_oud[0]['score_2']
+                score = score + score_oud[0]['score_1']
                 ronde_oud = db.execute("SELECT ronde FROM spel WHERE spelid=:spelid", spelid=spelid)
                 ronde = ronde_oud[0]['ronde'] + 1
                 db.execute("UPDATE spel SET ronde = :ronde, score_1 = :score WHERE spelid = :spelid", ronde=ronde, score=score, spelid=spelid)
@@ -494,7 +498,6 @@ def fspel():
                  score_oud= (db.execute("SELECT score_2 FROM spel WHERE spelid=:spelid", spelid=spelid))
                  score = score + score_oud[0]['score_2']
                  ronde_oud = db.execute("SELECT ronde FROM spel WHERE spelid=:spelid", spelid=spelid)
-                 print (ronde_oud)
                  ronde = ronde_oud[0]['ronde'] + 1
                  db.execute("UPDATE spel SET ronde = :ronde, score_2 = :score WHERE spelid = :spelid", ronde=ronde, score=score, spelid=spelid)
             return redirect("/userpage")
@@ -523,9 +526,23 @@ def about():
 @app.route("/rspel", methods=["GET", "POST"])
 @login_required
 def rspel():
-    if request.method == "GET":
+    if request.method == "post":
         spelid = request.form.get("id")
         db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
-        return redirect("/userpage")
-    else:
         return render_template("userpage.html")
+    else:
+        spelid = request.form.get("id")
+        db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
+        return render_template("userpage.html")
+
+@app.route("/doorverwijs", methods=["GET", "POST"])
+@login_required
+def doorverwijs():
+    if request.method == "post":
+        session["spelid"] = request.form.get("id")
+        print(session["spelid"], "test")
+        return render_template("spel.html")
+    else:
+        session["spelid"] = request.form.get("id")
+        print(session["spelid"], "test")
+        return render_template("doorverwijs.html")
