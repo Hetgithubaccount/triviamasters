@@ -442,7 +442,7 @@ def fspel():
                 for name in i:
                     username = i[name]
             score = session["score"]
-            naam = db.execute("SELECT username FROM spel WHERE spelid= : spelid", spelid=spelid)
+            naam = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)
             if naam == username:
                 db.execute("UPDATE spel SET ronde += 1, score_1 += :score WHERE spelid = :spelid", score=score, spelid=spelid)
             else:
