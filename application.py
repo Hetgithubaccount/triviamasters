@@ -443,6 +443,7 @@ def gamewfriend():
         categorieën = ""
         a = db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
         session["spelid"] = a
+        print(session["spelid"], "hier1")
         return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
@@ -451,8 +452,8 @@ def gamewfriend():
 @login_required
 def fspel():
     if request.method == "GET":
-        session["spelid"] = request.form.get("id")
-        print(session["spelid"])
+        # session["spelid"] = request.form.get("id")
+        print(session["spelid"], "hier2")
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
@@ -487,9 +488,17 @@ def fspel():
             score = session["score"]
             naam = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)
             if naam == username:
-                db.execute("UPDATE spel SET ronde += 1, score_1 += :score WHERE spelid = :spelid", score=score, spelid=spelid)
+                score_oud = int(db.execute("SELECT score_1 FROM spel WHERE spelid=:spelid", spelid=spelid))
+                score = score + score_oud
+                ronde_oud = db.execute("SELECT ronde FROM spel WHERE spelid=:spelid", spelid=spelid)
+                ronde = int(ronde_oud) + 1
+                db.execute("UPDATE spel SET ronde = :ronde, score_1 = :score WHERE spelid = :spelid", ronde=ronde, score=score, spelid=spelid)
             else:
-                 db.execute("UPDATE spel SET ronde += 1, score_2 += :score WHERE spelid = :spelid", score=score, spelid=spelid)
+                 score_oud= (db.execute("SELECT score_2 FROM spel WHERE spelid=:spelid", spelid=spelid))
+                 score = score + score_oud[0]['score_2']
+                 ronde_oud = db.execute("SELECT ronde FROM spel WHERE spelid=:spelid", spelid=spelid)
+                 ronde = ronde_oud[0]['ronde'] + 1
+                 db.execute("UPDATE spel SET ronde = :ronde, score_2 = :score WHERE spelid = :spelid", ronde=ronde, score=score, spelid=spelid)
             return redirect("/userpage")
         # print(vraag)
         # spelid = session["spelid"]
