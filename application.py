@@ -139,6 +139,7 @@ def logout():
     return redirect("/")
 
 @app.route("/friends", methods=["GET", "POST"])
+@login_required
 def findfriends():
     if request.method == "GET":
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
@@ -158,6 +159,7 @@ def findfriends():
         return render_template("friends.html")
 
 @app.route("/addfriend", methods=["GET", "POST"])
+@login_required
 def addfriend():
     if request.method == "POST":
         friendname = request.form.get("addusername")
@@ -178,6 +180,7 @@ def addfriend():
         return render_template("friends.html")
 
 @app.route("/delfriend", methods=["GET", "POST"])
+@login_required
 def delfriend():
     if request.method == "POST":
         friendname = request.form.get("delusername")
@@ -236,7 +239,7 @@ def join():
                     db.execute("UPDATE spel SET opponent=:opponent WHERE spelid=:code", opponent=request.form.get("opponent"), code=code)
                     session["gameid"] = code
                     session["username"] = request.form.get("opponent")
-                    return render_template("gamewcode.html")
+                    return redirect("/gamewcode")
                 else:
                     return apology("already 2 players in game", 403)
             else:
@@ -286,11 +289,19 @@ def startsinglegame():
         # print(vraag)
         if session["vraag"] == 10:
             session["vraag"] = 0
-            return render_template("eind.html")
+            return render_template("singlegameend.html")
         print(session["score"])
         # print(vraag)
 
         return redirect("/game")
+
+@app.route("/singlegameend", methods=["GET", "POST"])
+def singlegameend():
+    if request.method == "POST":
+        session.clear()
+        render_template("index.html")
+    else:
+        render_template("singlegameend.html")
 
 @app.route("/gamewcode", methods=["GET", "POST"])
 def gamewcode():
@@ -314,11 +325,26 @@ def gamewcode():
         # print(vraag)
         if session["vraag"] == 10:
             session["vraag"] = 0
-            return render_template("eind.html")
+            return render_template("gamewcodeend.html")
         print(session["score"])
         # print(vraag)
 
         return redirect("/gamewcode")
+
+@app.route("/gamewcodeend", methods=["GET", "POST"])
+def gamewcodeend():
+    if request.method == "POST":
+        spelid = session["gameid"]
+        result1 = db.execute("SELECT score_1 FROM spel WHERE spelid=:spelid", spelid=spelid)
+        result2 = db.execute("SELECT score_2 FROM spel WHERE spelid=:spelid", spelid=spelid)
+        if result1 != 0 and result2 !=0:
+            db.execute("DELETE * FROM spel WHERE spelid=:spelid", spelid=spelid)
+            session.clear()
+        return render_template("index.html")
+    else:
+        return render_template("gamewcodeend.html")
+
+
 
 
 def newquestion():
