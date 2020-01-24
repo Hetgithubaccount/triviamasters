@@ -491,4 +491,8 @@ def about():
 @login_required
 def rspel():
     if request.method == "POST":
-        print("test")
+        spelid = request.form.get("id")
+        db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
+        return redirect("/userpage")
+    else:
+        return render_template("userpage.html")
