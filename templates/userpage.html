@@ -19,14 +19,15 @@
             <th>Play</th>
             <th>Delete Game</th>
           </tr>
-            {% for data in row %}
+            {% for data in spell %}
               <tr>
-                  {% for punt in data %}
-                <td>{{ punt }}</td>
-                  {% endfor %}
+                <td>{{data.opponent}}</td>
+                 <td>{{data.ronde}}</td>
+                  <td>{{data.score_1}}</td>
+                   <td>{{data.score_2}}</td>
                 <td>
                     <form action="/spel" method="get">
-                    <button class="btn default" name="answer" value= {{spel}} type="submit">Play</button>
+                    <button class="btn default" name="id" value="{{data.spelid}}" type="submit">Play</button>
                     </form>
                 </td>
                 <td>
