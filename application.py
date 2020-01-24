@@ -299,9 +299,9 @@ def startsinglegame():
 def singlegameend():
     if request.method == "POST":
         session.clear()
-        render_template("index.html")
+        return render_template("index.html")
     else:
-        render_template("singlegameend.html")
+        return render_template("singlegameend.html")
 
 @app.route("/gamewcode", methods=["GET", "POST"])
 def gamewcode():
