@@ -47,6 +47,10 @@ nav {
     background-color: transparent;
     color: white;
 }
+.navbar-light .navbar-nav mr-auto mt-2 .nav-item{
+    /* werkt nog niet om een of andere reden */
+    color: red;
+}
 body {
     background-image: url("background.jpg");
     background-size: 100%;
