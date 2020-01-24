@@ -83,6 +83,7 @@ nav .navbar-brand
 #quesbutton {
     margin:auto;
     margin-bottom: 10px;
+    white-space: normal;
     text-align: center;
     text-decoration: none;
     font-size: 30px;
