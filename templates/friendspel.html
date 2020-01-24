@@ -8,11 +8,11 @@
 <field>
           <h3> ronde: {{ronde}}</h3>
           <h2 id= "category"> Category: {{categ}}</h2>
-          <H2 class = "question" style="font-weight:bold;"> Question: {{question}}</H2>
+          <H2 class = "question" style="font-weight:bold;"> Question: {{question | safe}}</H2>
           <form action="/spel" method="post">
           <div>
           {%for option in answerlist%}
-          <button id="quesbutton" class="btn default" name="answer" type="submit" value="{{ option}}">{{option}}</button>
+          <button id="quesbutton" class="btn default" name="answer" type="submit" value="{{ option}}">{{option | safe}}</button>
           {%endfor%}
           </div>
           </form>
