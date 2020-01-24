@@ -403,16 +403,17 @@ def userpage():
         idee = []
         spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
         spel = db.execute("SELECT * FROM spel WHERE opponent= :opponent", opponent=opponent)
-        print(spel, spell)
+        print(spell)
+
         for i in spell:
             row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
             idee.append((i["spelid"]))
-        spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
-        session["gameid"] = spelid
+        # spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
+        # session["gameid"] = spelid
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
-        return render_template("userpage.html", row=row, idee=idee)
+        return render_template("userpage.html", spell=spell, idee=idee)
     else:
         return render_template("userpage.html")
 
@@ -431,7 +432,6 @@ def gamewfriend():
         for i in username:
             for name in i:
                 username = i[name]
-        print(username)
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
         if not friend:
@@ -441,7 +441,8 @@ def gamewfriend():
         score_1 = 0
         score_2 = 0
         categorieën = ""
-        db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
+        a = db.execute("INSERT INTO spel (username, opponent, ronde, score_1, score_2, categorieën) VALUES (:username, :opponent, :ronde, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, ronde=ronde,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
+        session["spelid"] = a
         return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
@@ -450,6 +451,8 @@ def gamewfriend():
 @login_required
 def fspel():
     if request.method == "GET":
+        session["spelid"] = request.form.get("id")
+        print(session["spelid"])
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
@@ -459,6 +462,8 @@ def fspel():
         return render_template("friendspel.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
     if request.method == "POST":
+        spelid= session["spelid"]
+        print(spelid)
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
@@ -474,7 +479,6 @@ def fspel():
             session["multiply"] = "X1"
         if session["vraag"] == 10:
             session["vraag"] = 0
-            spelid = session["gameid"]
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
             for i in username:
