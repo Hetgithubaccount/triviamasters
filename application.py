@@ -545,6 +545,12 @@ def fspel():
                      score_2= session["score_2"]
                      opponent = (db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid))
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, spelid) VALUES (:username, :opponent, :score_1, :score_2, :spelid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, spelid=spelid)
+                     hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)
+                     hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)
+                     if score_1 > hscore_1:
+                         db.execute("UPDATE users SET highscore = :hscore_1 WHERE username = :username", hscore_1= hscore_1, username=username)
+                     if score_2 > hscore_2:
+                          db.execute("UPDATE users SET highscore = :hscore_2 WHERE username = :opponent", hscore_2=hscore_2, opponent=opponent)
             return redirect("/userpage")
         return redirect("/spel")
 
@@ -552,9 +558,13 @@ def fspel():
 @login_required
 def leaderbords():
     if request.method == "POST":
-        return render_template("leaderboards.html")
+        hscores= db.execute ("select * FROM users")
+        print(hscores)
+        return render_template("leaderboards.html", hscores=hscores)
     else:
-        return render_template("leaderboards.html")
+        hscores= db.execute("select * FROM users")
+        print(hscores)
+        return render_template("leaderboards.html", hscores=hscores)
 
 @app.route("/about", methods=["GET", "POST"])
 def about():
