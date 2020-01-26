@@ -557,7 +557,6 @@ def leaderbords():
         return render_template("leaderboards.html")
 
 @app.route("/about", methods=["GET", "POST"])
-@login_required
 def about():
     if request.method == "POST":
         return render_template("about.html")
