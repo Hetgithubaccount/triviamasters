@@ -8,23 +8,25 @@
     <field>
         <h3>Singleplayer Mode</h3>
         <form action="/game" method="get">
-            <button class="btn btn-primary" class= "form-game" type="submit">Spelen</button>
+            <button class="btn btn-primary" class= "form-game" type="submit">Play</button>
         </form>
-        <h3>Eenmalig spel aanmaken</h3>
+        <h3>Start multiplayer game</h3>
         <form action="/" method="post">
             <div class="form-start">
-                <input autocomplete="off" autofocus class="form-start" name="username" placeholder="Username" type="text">
+                <input autocomplete="off" autofocus class="form-start" name="username" placeholder="Name" type="text">
             </div>
-            <button class="btn btn-primary" class= "form-start" type="submit">Start spel</button>
+            <button class="btn btn-primary" class= "form-start" type="submit">Start game</button>
         </form>
-        <h3>Spel joinen</h3>
+        <h3>Join game</h3>
         <form action="/join" method="post">
             <div class="form-join">
-                <input autocomplete="off" autofocus class="form-join" name="opponent" placeholder="Opponent" type="text">
+                <input autocomplete="off" autofocus class="form-join" name="opponent" placeholder="Name" type="text">
             <div class="form-join">
                 <input class="form-join" name="number" placeholder="Code" type="text">
             </div>
-            <button class="btn btn-primary" class= "form-join" type="submit">Join spel</button>
+            <button class="btn btn-primary" class= "form-join" type="submit">Join game</button>
         </form>
+        <h3>New here?</h3>
+        <button class="btn btn-primary" onclick="window.location.href='about.html'">How to play</button>
     </field>
 {% endblock %}
