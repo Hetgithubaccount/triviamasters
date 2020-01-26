@@ -19,15 +19,15 @@
             <th>Play</th>
             <th>Delete Game</th>
           </tr>
-            {% for data in spell %}
+            {% for data in row %}
               <tr>
-                <td>{{data.opponent}}</td>
-                 <td>{{data.ronde}}</td>
-                  <td>{{data.score_1}}</td>
-                   <td>{{data.score_2}}</td>
+                <td>{{data[0]}}</td>
+                 <td>{{data[1]}}</td>
+                  <td>{{data[2]}}</td>
+                   <td>{{data[3]}}</td>
                 <td>
                     <form action="/doorverwijs" method="post">
-                    <button class="btn default" name="id" value="{{data.spelid}}" type="submit">Play</button>
+                    <button class="btn default" name="id" value="{{data[4]}}" type="submit">Play</button>
                     </form>
                 </td>
                 <td>
@@ -38,6 +38,24 @@
               </tr>
             {% endfor %}
         </table>
+    </field>
+    <field>
+        <h2> Your ended games</h2>
+        <table style="width:100%" action="/friends" method="get">
+          <tr>
+            <th>Opponent</th>
+            <th>Your Score</th>
+            <th>Opponent's Score</th>
+          </tr>
+            {% for data in ended %}
+              <tr>
+                <td>{{ended[0]}}</td>
+                 <td>{{ended[2]}}</td>
+                  <td>{{ended[2]}}</td>
+          </tr>
+        {%endfor %}
+        </table>
+
     </field>
 {% endblock %}
 
