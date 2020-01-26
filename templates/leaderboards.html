@@ -16,16 +16,13 @@
     </tr>
   </thead>
   <tbody>
+    {% for score in hscores %}
     <tr>
       <th scope="row">1</th>
-      <td>Luuk</td>
-      <td>130</td>
+      <td>{{ score.username}}</td>
+      <td>{{ score.highscore}}</td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Max</td>
-      <td>129</td>
-    </tr>
+    {% endfor %}
   </tbody>
 </table>
 {% endblock %}
