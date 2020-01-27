@@ -435,6 +435,7 @@ def userpage():
 def gamewfriend():
     session["score"] = 0
     session["vraag"] = 0
+    session["ronde"] = 1
     if request.method == "POST":
         opponent = request.form.get("f-opponent")
         if not opponent:
@@ -474,6 +475,7 @@ def fspel():
             for name in i:
                 username = i[name]
         spelid= session["spelid"]
+        session["ronde"] = db.execute("SELECT ronde FROM spel WHERE spelid= :spelid", spelid=spelid)[0]["ronde"]
         naam = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)
         ronde_1 = db.execute("SELECT ronde_1 FROM spel WHERE spelid=:spelid", spelid=spelid)
         print(ronde_1)
