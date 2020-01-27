@@ -5,11 +5,13 @@
 {% endblock %}
 
 {% block main %}
+    <body>
     <field>
         <h2> Congrats!!</h2>
         <h3> Your final score is: {{ session["score"]}}</h3>
-        <form action="/gamewcodeend" method="post">
-            <button class="btn default" name="terug" type="submit"> Back home </button>
+        <form action="/result" method="post">
+            <button class="btn default" name="terug" type="submit"> see results </button>
         </form>
     </field>
+    </body>
 {% endblock %}
