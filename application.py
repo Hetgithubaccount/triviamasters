@@ -547,17 +547,21 @@ def fspel():
                  ronde = ronde_1
                  print(ronde, "test")
                  db.execute("UPDATE spel SET ronde = :ronde WHERE spelid = :spelid", ronde=ronde, spelid=spelid)
-                 if ronde == 5:
-                     score_1 = session["score_1"]
-                     score_2 = db.execute("SELECT score_2 FROM spel WHERE spelid = :spelid", spelid=spelid)
-                     opponent = (db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid))
+                 if ronde == 2:
+                     print(ronde)
+                     score_1 = db.execute("SELECT score_1 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_1"]
+                     score_2 = db.execute("SELECT score_2 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_2"]
+                     opponent = db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid)[0]["opponent"]
+                    #  opponent = opponent[0]["opponent"]
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, spelid) VALUES (:username, :opponent, :score_1, :score_2, :spelid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, spelid=spelid)
-                     hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)
-                     hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)
+                     hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
+                     hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
+                    #  db.execute("DELETE * FROM spel WHER")
                      if score_1 > hscore_1:
                          db.execute("UPDATE users SET highscore = :hscore_1 WHERE username = :username", hscore_1= hscore_1, username=username)
                      if score_2 > hscore_2:
                           db.execute("UPDATE users SET highscore = :hscore_2 WHERE username = :opponent", hscore_2=hscore_2, opponent=opponent)
+                     return redirect("/userpage")
             return redirect("/userpage")
         return redirect("/spel")
 
