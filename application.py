@@ -307,7 +307,7 @@ def gamewcode():
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
-        answerlist = quest[2]
+        answerlist = set(quest[2])
         categ = quest[3]
         username = session["username"]
         code = session["gameid"]
@@ -343,7 +343,7 @@ def gamewcodeend():
         if result1 != 0 and result2 !=0:
             db.execute("DELETE * FROM spel WHERE spelid=:spelid", spelid=spelid)
             session.clear()
-        return render_template("index.html")
+        return render_template("gamewcodeend.html")
     else:
         return render_template("gamewcodeend.html")
 
@@ -514,7 +514,7 @@ def fspel():
             session["multiply"] = "X2"
         else:
             session["multiply"] = "X1"
-        if session["vraag"] == 2:
+        if session["vraag"] == 10:
             session["vraag"] = 0
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
@@ -547,8 +547,7 @@ def fspel():
                  ronde = ronde_1
                  print(ronde, "test")
                  db.execute("UPDATE spel SET ronde = :ronde WHERE spelid = :spelid", ronde=ronde, spelid=spelid)
-                 if ronde == 2:
-                     print(ronde)
+                 if ronde == 5:
                      score_1 = db.execute("SELECT score_1 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_1"]
                      score_2 = db.execute("SELECT score_2 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_2"]
                      opponent = db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid)[0]["opponent"]
@@ -556,14 +555,13 @@ def fspel():
                     #  opponent = opponent[0]["opponent"]
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, spelid) VALUES (:username, :opponent, :score_1, :score_2, :spelid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, spelid=spelid)
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
-                     print(hscore_1)
                      hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
                     #  db.execute("DELETE * FROM spel WHER")
                      if score_1 > hscore_1:
                          db.execute("UPDATE users SET highscore = :hscore_1 WHERE username = :username", hscore_1= hscore_1, username=username)
                      if score_2 > hscore_2:
                           db.execute("UPDATE users SET highscore = :hscore_2 WHERE username = :opponent", hscore_2=hscore_2, opponent=opponent)
-                     db.execute("DELETE * FROM spel WHERE spelid = :spelid", spelid=spelid)
+                     db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid=spelid)
                      return redirect("/userpage")
             return redirect("/userpage")
         return redirect("/spel")
@@ -612,3 +610,10 @@ def doorverwijs():
         session["spelid"] = request.form.get("id")
         print(session["spelid"], "test")
         return render_template("doorverwijs.html")
+
+@app.route("/result", methods=["GET", "POST"])
+def result():
+    if request.method == "post":
+        return render_template("result.html")
+    else:
+        return render_template("result.html")
