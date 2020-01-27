@@ -286,12 +286,10 @@ def startsinglegame():
             session["multiply"] = "X2"
         else: session["multiply"] = "X1"
         session["vraag"] += 1
-        # print(vraag)
         if session["vraag"] == 10:
             session["vraag"] = 0
             return render_template("singlegameend.html")
         print(session["score"])
-        # print(vraag)
 
         return redirect("/game")
 
@@ -320,14 +318,19 @@ def gamewcode():
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
+            session["streak"] += 1
+        else:
+            session["streak"] = 0
             print("goed")
+        if session["streak"] >= 3:
+            session["score"] += 1
+            session["multiply"] = "X2"
+        else: session["multiply"] = "X1"
         session["vraag"] += 1
-        # print(vraag)
         if session["vraag"] == 10:
             session["vraag"] = 0
             return render_template("gamewcodeend.html")
         print(session["score"])
-        # print(vraag)
 
         return redirect("/gamewcode")
 
