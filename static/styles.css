@@ -6,6 +6,8 @@
 #preload {
     display: none;
 }
+
+
 name {
   text-align: center;
   font-weight: normal;
@@ -51,6 +53,7 @@ field {
     background-color: rgba(0, 0, 0, .5);
     padding: 25px 0px;
     width: 70%;
+    margin-top:10px;
 }
 .btn btn-primary{
     margin-left: 0;
