@@ -418,11 +418,11 @@ def userpage():
         end1 = db.execute("SELECT * FROM ended WHERE username= :username", username=username)
         end2 = db.execute("SELECT * FROM ended WHERE opponent= :opponent", opponent=opponent)
         for i in end1:
-            ended.append(i["opponent"], i["score_1"], i["score_2"])
+            a = [i["opponent"], i["score_1"], i["score_2"]]
+            ended.append(a)
         for i in end2:
-            ended.append(i["username"], i["score_2"], i["score_1"])
-
-
+            a= [i["username"], i["score_2"], i["score_1"]]
+            ended.append(a)
         return render_template("userpage.html", spell=spell, idee=idee, spel=spel, row=row, ended=ended)
     else:
         return render_template("userpage.html")
@@ -511,7 +511,7 @@ def fspel():
             session["multiply"] = "X2"
         else:
             session["multiply"] = "X1"
-        if session["vraag"] == 10:
+        if session["vraag"] == 2:
             session["vraag"] = 0
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
@@ -549,15 +549,18 @@ def fspel():
                      score_1 = db.execute("SELECT score_1 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_1"]
                      score_2 = db.execute("SELECT score_2 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_2"]
                      opponent = db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid)[0]["opponent"]
+                     username = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)[0]["username"]
                     #  opponent = opponent[0]["opponent"]
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, spelid) VALUES (:username, :opponent, :score_1, :score_2, :spelid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, spelid=spelid)
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
+                     print(hscore_1)
                      hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
                     #  db.execute("DELETE * FROM spel WHER")
                      if score_1 > hscore_1:
                          db.execute("UPDATE users SET highscore = :hscore_1 WHERE username = :username", hscore_1= hscore_1, username=username)
                      if score_2 > hscore_2:
                           db.execute("UPDATE users SET highscore = :hscore_2 WHERE username = :opponent", hscore_2=hscore_2, opponent=opponent)
+                     db.execute("DELETE * FROM spel WHERE spelid = :spelid", spelid=spelid)
                      return redirect("/userpage")
             return redirect("/userpage")
         return redirect("/spel")
