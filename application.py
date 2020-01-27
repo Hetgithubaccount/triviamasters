@@ -69,12 +69,12 @@ def register():
 
         if result:
             return apology("Username already exist", 400)
-
+        highscore = 0
         #creates user
-        session["user_id"] = db.execute("INSERT INTO users (username, hash) \
-                             VALUES(:username, :hash)", \
+        session["user_id"] = db.execute("INSERT INTO users (username, hash, highscore) \
+                             VALUES(:username, :hash, :highscore)", \
                              username=request.form.get("username"), \
-                             hash=generate_password_hash(request.form.get("password")))
+                             hash=generate_password_hash(request.form.get("password")), highscore=highscore)
 
         return render_template("userpage.html")
 
