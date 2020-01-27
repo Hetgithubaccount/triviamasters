@@ -404,7 +404,7 @@ def userpage():
         spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
         spel = db.execute("SELECT * FROM spel WHERE opponent= :opponent", opponent=opponent)
         for i in spell:
-            row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"]))
+            row.append((i["opponent"],i["ronde"], i["score_1"], i["score_2"], i["spelid"]))
             idee.append((i["spelid"]))
         for i in spel:
             row.append((i["username"],i["ronde"], i["score_2"], i["score_1"], i["spelid"]))
@@ -490,14 +490,14 @@ def fspel():
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
-        answerlist = quest[2]
+        answerlist = set(quest[2])
+        print(answerlist)
         categ = quest[3]
         session["coranswer"] = coranswer
         return render_template("friendspel.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
     if request.method == "POST":
         spelid= session["spelid"]
-        print(spelid)
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
@@ -537,12 +537,16 @@ def fspel():
                  db.execute("UPDATE spel SET ronde_2 = :ronde, score_2 = :score WHERE spelid = :spelid", ronde=ronde, score=score, spelid=spelid)
             ronde_2= (db.execute("SELECT ronde_2 FROM spel WHERE spelid=:spelid", spelid=spelid))
             ronde_1= (db.execute("SELECT ronde_1 FROM spel WHERE spelid=:spelid", spelid=spelid))
+            print(ronde_2, ronde_1, "test")
+            ronde_1 = ronde_1[0]["ronde_1"]
+            ronde_2 = ronde_2[0]["ronde_2"]
             if ronde_2 == ronde_1:
                  ronde = ronde_1
+                 print(ronde, "test")
                  db.execute("UPDATE spel SET ronde = :ronde WHERE spelid = :spelid", ronde=ronde, spelid=spelid)
                  if ronde == 5:
                      score_1 = session["score_1"]
-                     score_2= session["score_2"]
+                     score_2 = db.execute("SELECT score_2 FROM spel WHERE spelid = :spelid", spelid=spelid)
                      opponent = (db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid))
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, spelid) VALUES (:username, :opponent, :score_1, :score_2, :spelid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, spelid=spelid)
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)
@@ -577,13 +581,15 @@ def about():
 @login_required
 def rspel():
     if request.method == "post":
-        spelid = request.form.get("id")
+        spelid = request.form.get("delete")
+        print(spelid)
         db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
         return render_template("userpage.html")
     else:
-        spelid = request.form.get("id")
+        spelid = request.form.get("delete")
+        print(spelid)
         db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid = spelid)
-        return render_template("userpage.html")
+        return redirect("/userpage")
 
 @app.route("/doorverwijs", methods=["GET", "POST"])
 @login_required
