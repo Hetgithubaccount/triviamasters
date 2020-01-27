@@ -556,6 +556,29 @@ def fspel():
                      username = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)[0]["username"]
                     #  opponent = opponent[0]["opponent"]
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, spelid) VALUES (:username, :opponent, :score_1, :score_2, :spelid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, spelid=spelid)
+
+                     # Determines who is "username" and who is "friend" in database
+                     friends_username = db.execute("SELECT friend FROM friends WHERE username = :username", username = username)
+                     friends_opponent = db.execute("SELECT friend FROM friends WHERE username = :username", username = opponent)
+                     # If username = username and friend = opponent
+                     if opponent in friends_username:
+                        db.execute("UPDATE friends SET games = games + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
+                        # If username won the game
+                        if score_1 > score_2:
+                            db.execute("UPDATE friends SET won = won + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
+                        # If opponent won the game
+                        if score_2 > score_1:
+                            db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
+                     # If username = opponent and friend = username
+                     if username in friends_opponent:
+                        db.execute("UPDATE friends SET games = games + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
+                        # If username won the game
+                        if score_1 > score_2:
+                            db.execute("UPDATE friends SET won = won + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
+                        # If opponent won the game
+                        if score_2 > score_1:
+                            db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
+
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
                      hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
                     #  db.execute("DELETE * FROM spel WHER")
