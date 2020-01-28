@@ -264,19 +264,6 @@ def join():
     else:
         return render_template("index.html")
 
-@app.route("/wacht", methods=["GET", "POST"])
-def wacht():
-    if request.method == "GET":
-        opponent = False
-        while opponent == False:
-            result = db.execute("SELECT opponent FROM spel WHERE spelid=:gameid", gameid=session["gameid"])
-            if result[0]["opponent"] != "":
-                opponent = True
-
-            time.sleep(.9)
-        return render_template("game.html")
-    else:
-        return render_template("wacht.html")
 
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
@@ -362,20 +349,6 @@ def gamewcodeend():
     else:
         return render_template("gamewcodeend.html")
 
-
-
-
-def newquestion():
-    with open('questions.csv', newline='') as csv_file:
-            reader = list(csv.reader(csv_file))    # nieuwe vraag
-            sequence = random.choice(reader)
-            category = sequence[0]
-            question = sequence[3]
-            coranswer = sequence[4]
-            # print(coranswer)
-            answerlist = {sequence[4], sequence[5], sequence[6], sequence[7]}
-            # print("test", [question, coranswer, answerlist, category])
-    return [question, coranswer, answerlist, category]
 
 def vragen():
     response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
