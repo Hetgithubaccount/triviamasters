@@ -3,10 +3,10 @@
 @import "compass/css3/transform";
 @import url(https://fonts.googleapis.com/css?family=Bangers);
 
-#preload {
+/*preload {
     display: none;
 }
-
+*/
 
 name {
   text-align: center;
