@@ -11,7 +11,7 @@ import sqlite3
 import csv
 import requests
 
-from helpers import apology, login_required
+from helpers import apology, login_required, vragen
 import json
 
 # Configure application
@@ -446,8 +446,6 @@ def userpage():
         for i in spel:
             row.append((i["username"],i["ronde"], i["score_2"], i["score_1"], i["spelid"]))
             idee.append((i["spelid"]))
-        # spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
-        # session["gameid"] = spelid
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
@@ -505,11 +503,12 @@ def gamewfriend():
 @login_required
 def fspel():
     if request.method == "GET":
+        # Get username of user
         id = session["user_id"]
-        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
-        for i in username:
-            for name in i:
-                username = i[name]
+        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
+        # for i in username:
+        #     for name in i:
+        #         username = i[name]
         spelid= session["spelid"]
         session["ronde"] = db.execute("SELECT ronde FROM spel WHERE spelid= :spelid", spelid=spelid)[0]["ronde"]
         naam = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)
@@ -527,7 +526,7 @@ def fspel():
                 return apology("wait till opponent has played the previous round", 403)
 
 
-        # session["spelid"] = request.args.get("id")
+        # Collects question and uses indexation to grab each individual part of the database output
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
