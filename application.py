@@ -489,6 +489,7 @@ def fspel():
         ronde_2 = ronde_2[0]["ronde_2"]
         naam = naam[0]["username"]
         if naam == username:
+            # Checks if player one is in the same round as player 2
             if ronde_1 > ronde_2:
                 return apology("wait till opponent has played the previous round", 403)
         else:
@@ -503,29 +504,33 @@ def fspel():
         answerlist = set(quest[2])
         categ = quest[3]
         session["coranswer"] = coranswer
+        # Return the data of the question to friendspel.html
         return render_template("friendspel.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
-
+    # If the player clicks on an answer
     if request.method == "POST":
+        # Get gameid
         gameid= session["gameid"]
+        # Get the answer the user has chosen
         ingevuld = str(request.form.get("answer"))
+        # Check if the answer is the right one, if yes score +1 and streak + 1, if not reset streak
         if ingevuld == session["coranswer"]:
             session["score"] += 1
             session["streak"] += 1
         else:
             session["streak"] = 0
+        # The answered question count + 1
         session["vraag"] += 1
+        # Check if streak is more than 3 to activate multiplier (correct answer is 2 points)
         if session["streak"] >= 3:
             session["score"] += 1
             session["multiply"] = "X2"
         else:
             session["multiply"] = "X1"
-        if session["vraag"] == 2:
+        # After 10 questions the round is finished
+        if session["vraag"] == 10:
             session["vraag"] = 0
             id = session["user_id"]
-            username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
-            for i in username:
-                for name in i:
-                    username = i[name]
+            username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
             score = session["score"]
             naam = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)
             naam = naam[0]["username"]
