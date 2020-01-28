@@ -83,10 +83,25 @@ def register():
 
 @app.route("/checkusername", methods=["GET"])
 def checkusername():
-    """Return true if username available, else false, in JSON format"""
+    """Return true if username available/registered, else false, in JSON format"""
     result = db.execute("SELECT * FROM users \
                             WHERE username=:username", username=request.args.get("username"))
     if len(result) > 0:
+        return jsonify(False)
+    else:
+        return jsonify(True)
+
+@app.route("/checkpassword", methods=["GET"])
+def checkpassword():
+    """Return true if password is correct, else false, in JSON format"""
+    print(request.args)
+    username = request.args.get("username")
+    password = request.args.get("password")
+
+    result = db.execute("SELECT * FROM users \
+                            WHERE username=:username", username=username)
+
+    if check_password_hash(result[0]["hash"], password):
         return jsonify(False)
     else:
         return jsonify(True)
@@ -610,10 +625,12 @@ def leaderbords():
         hscores= db.execute("SELECT highscore, username FROM users")
         users= db.execute("SELECT count(*) FROM users")[0]["count(*)"]
         user_count = []
-        for i in range(users + 1):
+        for i in range(11):
             if i > 0:
                 user_count.append(i)
-        hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))
+
+
+        hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))[:10]
         rangschikking = zip(hscores,user_count)
         return render_template("leaderboards.html", rangschikking=rangschikking)
 
