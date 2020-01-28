@@ -11,7 +11,7 @@ import sqlite3
 import csv
 import requests
 
-from helpers import apology, login_required
+from helpers import apology, login_required, vragen
 import json
 
 # Configure application
@@ -378,21 +378,21 @@ def gamewcodeend():
         return render_template("gamewcodeend.html")
 
 
-def vragen():
-    response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
-    apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple", "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple", "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple", "animals": "https://opentdb.com/api.php?amount=49&category=27&type=multiple"}
-    api = random.choice(list(apis.keys()))
-    response = requests.get(apis[api])
-    sport = response.json()
-    vragen = sport["results"]
-    sequence = random.choice(vragen)
-    category = sequence["category"]
-    question = sequence["question"]
-    coranswer = sequence["correct_answer"]
-    answerlist = sequence["incorrect_answers"]
-    answerlist.append(coranswer)
-    # print(coranswer)
-    return [question, coranswer, answerlist, category]
+# def vragen():
+#     response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
+#     apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple", "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple", "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple", "animals": "https://opentdb.com/api.php?amount=49&category=27&type=multiple"}
+#     api = random.choice(list(apis.keys()))
+#     response = requests.get(apis[api])
+#     sport = response.json()
+#     vragen = sport["results"]
+#     sequence = random.choice(vragen)
+#     category = sequence["category"]
+#     question = sequence["question"]
+#     coranswer = sequence["correct_answer"]
+#     answerlist = sequence["incorrect_answers"]
+#     answerlist.append(coranswer)
+#     # print(coranswer)
+#     return [question, coranswer, answerlist, category]
 
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
@@ -428,8 +428,6 @@ def userpage():
         for i in spel:
             row.append((i["username"],i["ronde"], i["score_2"], i["score_1"], i["spelid"]))
             idee.append((i["spelid"]))
-        # spelid = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent= :opponent", username=username, opponent=opponent)
-        # session["gameid"] = spelid
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
@@ -487,11 +485,12 @@ def gamewfriend():
 @login_required
 def fspel():
     if request.method == "GET":
+        # Get username of user
         id = session["user_id"]
-        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
-        for i in username:
-            for name in i:
-                username = i[name]
+        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
+        # for i in username:
+        #     for name in i:
+        #         username = i[name]
         spelid= session["spelid"]
         session["ronde"] = db.execute("SELECT ronde FROM spel WHERE spelid= :spelid", spelid=spelid)[0]["ronde"]
         naam = db.execute("SELECT username FROM spel WHERE spelid=:spelid", spelid=spelid)
@@ -509,7 +508,7 @@ def fspel():
                 return apology("wait till opponent has played the previous round", 403)
 
 
-        # session["spelid"] = request.args.get("id")
+        # Collects question and uses indexation to grab each individual part of the database output
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
