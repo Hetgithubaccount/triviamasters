@@ -391,26 +391,6 @@ def gamewcodeend():
     else:
         return render_template("gamewcodeend.html")
 
-def vragen():
-    response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
-    apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple",  \
-            "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple",  \
-            "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple",  \
-            "animals": "https://opentdb.com/api.php?amount=49&category=27&type=multiple"}
-    api = random.choice(list(apis.keys()))
-    response = requests.get(apis[api])
-    sport = response.json()
-    vragen = sport["results"]
-    sequence = random.choice(vragen)
-    category = sequence["category"]
-    question = sequence["question"]
-    coranswer = sequence["correct_answer"]
-    answerlist = sequence["incorrect_answers"]
-    answerlist.append(coranswer)
-    # print(coranswer)
-    return [question, coranswer, answerlist, category]
-
-
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
     if request.method == "POST":
