@@ -595,13 +595,17 @@ def fspel():
 @login_required
 def leaderbords():
     if request.method == "POST":
-        hscores= db.execute ("select * FROM users")
-        print(hscores)
-        return render_template("leaderboards.html", hscores=hscores)
+        return render_template("leaderboards.html")
     else:
-        hscores= db.execute("select * FROM users")
-        print(hscores)
-        return render_template("leaderboards.html", hscores=hscores)
+        hscores= db.execute("SELECT highscore, username FROM users")
+        users= db.execute("SELECT count(*) FROM users")[0]["count(*)"]
+        user_count = []
+        for i in range(users + 1):
+            if i > 0:
+                user_count.append(i)
+        hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))
+        rangschikking = zip(hscores,user_count)
+        return render_template("leaderboards.html", rangschikking=rangschikking)
 
 @app.route("/about", methods=["GET", "POST"])
 def about():
