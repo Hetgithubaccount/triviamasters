@@ -151,17 +151,20 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+# Checked for code quality 28/01/2019 by Nathan
 @app.route("/friends", methods=["GET", "POST"])
 @login_required
 def findfriends():
     if request.method == "GET":
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
-        for i in username:
-            for name in i:
-                username = i[name]
+
+        # Collects username
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
+        # Collects friends that user invited
         ownfriends = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
+        # Collects others that invited user to be friend (necessary because of database columns)
         reversefriends = db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
-        # Wisselt volgorde in lijst, zodat vriend wordt getoond op pagina ipv jouw eigen naam
+        # Swaps variables when user is "friend" in db to make sure information is displayed correctly,
+        # e.g. swaps names and amount of wins/losses
         for i in reversefriends:
             dude = i["username"]
             i["username"] = i["friend"]
@@ -169,49 +172,52 @@ def findfriends():
             games_won = i["won"]
             i["won"] = i["lose"]
             i["lose"] = games_won
+        # Compiles info, everything is now in the same order
         portfolio_contents = ownfriends + reversefriends
+
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
         return render_template("friends.html")
 
+# Checked for code quality 28/01/2019 by Nathan
 @app.route("/addfriend", methods=["GET", "POST"])
 @login_required
 def addfriend():
     if request.method == "POST":
-        friendname = request.form.get("addusername")
 
+        # Collects name of friend
+        friendname = request.form.get("addusername")
         # Checks if username is legit
         result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("addusername"))
         if not result:
             return apology("user does not exist", 403)
-
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
-        for i in username:
-            for name in i:
-                username = i[name]
+        # Collects username
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
+        # Database insert and reset of games/wins/losses
         db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose)", username = username,
                                                                                                 friend = friendname, games = 0, won = 0, lose = 0)
         return redirect("/friends")
     else:
         return render_template("friends.html")
 
+# Checked for code quality 28/01/2019 by Nathan
 @app.route("/delfriend", methods=["GET", "POST"])
 @login_required
 def delfriend():
     if request.method == "POST":
-        friendname = request.form.get("delusername")
 
+        # Collects name of friend
+        friendname = request.form.get("delusername")
         # Checks if username is legit
         result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("delusername"))
         if not result:
             return apology("user does not exist", 403)
-
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
-        for i in username:
-            for name in i:
-                username = i[name]
+        # Collects username
+        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
+        # Deletes friend (both cases are covered, so both users can delete the friendship)
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = friendname, friendname = username)
+
         return redirect("/friends")
     else:
         return render_template("friends.html")
@@ -265,41 +271,57 @@ def join():
     else:
         return render_template("index.html")
 
-
+# Checked for code quality 28/01/2019 by Nathan
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
     if request.method == "GET":
+
+        # Collects question and uses indexation to grab each individual part of the database output
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
         answerlist = quest[2]
         categ = quest[3]
+        # Saves correct answer to be used later
         session["coranswer"] = coranswer
+
+        # Question is rendered on screen
         return render_template("game.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
 
+    # After question is answered
     if request.method == "POST":
-        ingevuld = str(request.form.get("answer"))
-        if ingevuld == session["coranswer"]:
+
+        # Collects user answer
+        answer = str(request.form.get("answer"))
+        # Answer is correct, score and streak are updated
+        if answer == session["coranswer"]:
             session["score"] += 1
             session["streak"] += 1
+        # Answer is incorrect, streak back to zero
         else:
             session["streak"] = 0
+        # If user has answer streak, extra point is given and graphic is updated
         if session["streak"] >= 3:
             session["score"] += 1
             session["multiply"] = "X2"
+        # Graphic when user has no answer streak
         else: session["multiply"] = "X1"
+        # Question amount is updated
         session["vraag"] += 1
+        # Ends game if 10 questions have been answered
         if session["vraag"] == 10:
             session["vraag"] = 0
             return render_template("singlegameend.html")
-        print(session["score"])
-
+        # Restarts and generates new question
         return redirect("/game")
 
+# Checked for code quality 28/01/2019 by Nathan
 @app.route("/singlegameend", methods=["GET", "POST"])
 def singlegameend():
     if request.method == "POST":
+        # Clears question information
         session.clear()
+        # Returns to start page
         return render_template("index.html")
     else:
         return render_template("singlegameend.html")
