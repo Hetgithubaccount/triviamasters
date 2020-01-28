@@ -36,7 +36,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def vragen():
+def questions():
     response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
     apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple",  \
             "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple",  \
@@ -45,8 +45,8 @@ def vragen():
     api = random.choice(list(apis.keys()))
     response = requests.get(apis[api])
     sport = response.json()
-    vragen = sport["results"]
-    sequence = random.choice(vragen)
+    all_questions = sport["results"]
+    sequence = random.choice(all_questions)
     category = sequence["category"]
     question = sequence["question"]
     coranswer = sequence["correct_answer"]
