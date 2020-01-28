@@ -45,8 +45,6 @@ import time
 db = SQL("sqlite:///trivia.db")
 
 
-print()
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
