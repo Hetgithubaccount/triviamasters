@@ -447,7 +447,9 @@ def gamewfriend():
                 username = i[name]
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
-        if not friend:
+        friend2 = db.execute("SELECT username FROM friends WHERE friend = :username",
+                          username=username)
+        if not friend and not friend2:
              return apology("must add opponent as friend", 403)
         gespeeld = db.execute("SELECT spelid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
         if gespeeld:
@@ -516,7 +518,7 @@ def fspel():
             session["multiply"] = "X2"
         else:
             session["multiply"] = "X1"
-        if session["vraag"] == 10:
+        if session["vraag"] == 2:
             session["vraag"] = 0
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
@@ -542,14 +544,13 @@ def fspel():
                  db.execute("UPDATE spel SET ronde_2 = :ronde, score_2 = :score WHERE spelid = :spelid", ronde=ronde, score=score, spelid=spelid)
             ronde_2= (db.execute("SELECT ronde_2 FROM spel WHERE spelid=:spelid", spelid=spelid))
             ronde_1= (db.execute("SELECT ronde_1 FROM spel WHERE spelid=:spelid", spelid=spelid))
-            print(ronde_2, ronde_1, "test")
             ronde_1 = ronde_1[0]["ronde_1"]
             ronde_2 = ronde_2[0]["ronde_2"]
             if ronde_2 == ronde_1:
                  ronde = ronde_1
                  print(ronde, "test")
                  db.execute("UPDATE spel SET ronde = :ronde WHERE spelid = :spelid", ronde=ronde, spelid=spelid)
-                 if ronde == 5:
+                 if ronde == 2:
                      score_1 = db.execute("SELECT score_1 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_1"]
                      score_2 = db.execute("SELECT score_2 FROM spel WHERE spelid = :spelid", spelid=spelid)[0]["score_2"]
                      opponent = db.execute("SELECT opponent FROM spel WHERE spelid=:spelid", spelid=spelid)[0]["opponent"]
@@ -580,12 +581,16 @@ def fspel():
                             db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
 
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
+                     print(opponent, score_2, username, score_1)
                      hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
                     #  db.execute("DELETE * FROM spel WHER")
-                     if score_1 > hscore_1:
-                         db.execute("UPDATE users SET highscore = :hscore_1 WHERE username = :username", hscore_1= hscore_1, username=username)
-                     if score_2 > hscore_2:
-                          db.execute("UPDATE users SET highscore = :hscore_2 WHERE username = :opponent", hscore_2=hscore_2, opponent=opponent)
+                     print(score_1, score_2)
+                     if score_1 > int(hscore_1):
+                         print("b")
+                         db.execute("UPDATE users SET highscore = :score_1 WHERE username = :username", score_1= score_1, username=username)
+                     if score_2 > int(hscore_2):
+                         print("b")
+                         db.execute("UPDATE users SET highscore = :score_2 WHERE username = :opponent", score_2=score_2, opponent=opponent)
                      db.execute("DELETE FROM spel WHERE spelid = :spelid", spelid=spelid)
                      return redirect("/userpage")
             return redirect("/userpage")
