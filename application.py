@@ -11,7 +11,7 @@ import sqlite3
 import csv
 import requests
 
-from helpers import apology, login_required, vragen
+from helpers import apology, login_required, vragen, user
 import json
 
 # Configure application
@@ -159,7 +159,7 @@ def findfriends():
     if request.method == "GET":
 
         # Collects username
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
+        username = user()
         # Collects friends that user invited
         ownfriends = db.execute("SELECT * FROM friends WHERE username = :username", username = username)
         # Collects others that invited user to be friend (necessary because of database columns)
@@ -193,7 +193,7 @@ def addfriend():
         if not result:
             return apology("user does not exist", 403)
         # Collects username
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
+        username = user()
         # Database insert and reset of games/wins/losses
         db.execute("INSERT INTO friends (username, friend, games, won, lose)  \
                     VALUES (:username, :friend, :games, :won, :lose)", username = username, friend = friendname, games = 0, won = 0, lose = 0)
@@ -214,7 +214,7 @@ def delfriend():
         if not result:
             return apology("user does not exist", 403)
         # Collects username
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
+        username = user()
         # Deletes friend (both cases are covered, so both users can delete the friendship)
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = username, friendname = friendname)
         db.execute("DELETE FROM friends WHERE username = :username and friend = :friendname", username = friendname, friendname = username)
@@ -404,11 +404,8 @@ def errorhandler(e):
 @login_required
 def userpage():
     if request.method == "GET":
-        username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
-        for i in username:
-            for name in i:
-                username = i[name]
-                opponent = i[name]
+        username = user()
+        opponent = username
         row = []
         idee = []
         spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
@@ -438,28 +435,32 @@ def userpage():
 @app.route("/play", methods=["GET", "POST"])
 @login_required
 def gamewfriend():
-    #
+    #get session values for score amount of questions and the current ronde
     session["score"] = 0
     session["vraag"] = 0
     session["ronde"] = 1
     if request.method == "POST":
+        # Get opponent name from form
         opponent = request.form.get("f-opponent")
+        # Check if the form is not empty
         if not opponent:
              return apology("must insert friends username", 403)
+        # Get username with session_id
         id = session["user_id"]
-        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)
-        for i in username:
-            for name in i:
-                username = i[name]
+        username = user()
+        # Check in friends database if user has added opponent as friend
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
                           username=username)
         friend2 = db.execute("SELECT username FROM friends WHERE friend = :username",
                           username=username)
+        # Check if players are friends
         if not friend and not friend2:
              return apology("must add opponent as friend", 403)
-        gespeeld = db.execute("SELECT gameid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
-        if gespeeld:
+        # Query in spel if players already playing a game against each other at the moment
+        current_game = db.execute("SELECT gameid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
+        if current_game:
             return apology("you can only play 1 game per friend at the moment", 403)
+        # Make a new game in the database
         ronde_1 = 1
         ronde_2 = 1
         score_1 = 0
@@ -478,8 +479,7 @@ def gamewfriend():
 def fspel():
     if request.method == "GET":
         # Get username of user
-        id = session["user_id"]
-        username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
+        username = user()
         # Get gameid
         gameid= session["gameid"]
         session["ronde"] = db.execute("SELECT ronde FROM spel WHERE gameid= :gameid", gameid=gameid)[0]["ronde"]
@@ -490,12 +490,12 @@ def fspel():
         ronde_2 = ronde_2[0]["ronde_2"]
         naam = naam[0]["username"]
         if naam == username:
-            # Checks if player one is in the same round as player 2
+            # Checks if player one is in the same ronde as player 2
             if ronde_1 > ronde_2:
-                return apology("wait till opponent has played the previous round", 403)
+                return apology("wait till opponent has played the previous ronde", 403)
         else:
             if ronde_2 > ronde_1:
-                return apology("wait till opponent has played the previous round", 403)
+                return apology("wait till opponent has played the previous ronde", 403)
 
 
         # Collects question and uses indexation to grab each individual part of the database output
@@ -527,17 +527,16 @@ def fspel():
             session["multiply"] = "X2"
         else:
             session["multiply"] = "X1"
-        # After 10 questions the round is finished
+        # After 10 questions the ronde is finished
         if session["vraag"] == 10:
             session["vraag"] = 0
             # Get username of user
-            id = session["user_id"]
-            username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
+            username = user()
             # Get the endscore and the name of the person who started the game
             score = session["score"]
             naam = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)
             naam = naam[0]["username"]
-            # If the current user is the same as the player who started the game, get score_1 from spel and add the reached score. Also update round
+            # If the current user is the same as the player who started the game, get score_1 from spel and add the reached score. Also update ronde
             if naam == username:
                 score_oud = (db.execute("SELECT score_1 FROM spel WHERE gameid=:gameid", gameid=gameid))
                 score = score + score_oud[0]['score_1']
@@ -553,13 +552,13 @@ def fspel():
                  ronde_oud = db.execute("SELECT ronde_2 FROM spel WHERE gameid=:gameid", gameid=gameid)
                  ronde = ronde_oud[0]['ronde_2'] + 1
                  db.execute("UPDATE spel SET ronde_2 = :ronde, score_2 = :score WHERE gameid = :gameid", ronde=ronde, score=score, gameid=gameid)
-            # Get the amount of rounds the users has played. if the round is the same, the round index for userpage can be updated
+            # Get the amount of rondes the users has played. if the ronde is the same, the ronde index for userpage can be updated
             ronde_2= (db.execute("SELECT ronde_2 FROM spel WHERE gameid=:gameid", gameid=gameid))[0]["ronde_2"]
             ronde_1= (db.execute("SELECT ronde_1 FROM spel WHERE gameid=:gameid", gameid=gameid))[0]["ronde_1"]
             if ronde_2 == ronde_1:
                  ronde = ronde_1
                  db.execute("UPDATE spel SET ronde = :ronde WHERE gameid = :gameid", ronde=ronde, gameid=gameid)
-                 # If the players played 4 rounds get the endscores and the names of the players and insert the data in the table ended
+                 # If the players played 4 rondes get the endscores and the names of the players and insert the data in the table ended
                  if ronde == 5:
                      score_1 = db.execute("SELECT score_1 FROM spel WHERE gameid = :gameid", gameid=gameid)[0]["score_1"]
                      score_2 = db.execute("SELECT score_2 FROM spel WHERE gameid = :gameid", gameid=gameid)[0]["score_2"]
