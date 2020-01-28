@@ -153,6 +153,9 @@ def findfriends():
             dude = i["username"]
             i["username"] = i["friend"]
             i["friend"] = dude
+            games_won = i["won"]
+            i["won"] = i["lose"]
+            i["lose"] = games_won
         portfolio_contents = ownfriends + reversefriends
         return render_template("friends.html", portfolio_contents = portfolio_contents)
     else:
@@ -562,23 +565,25 @@ def fspel():
                      friends_username = db.execute("SELECT friend FROM friends WHERE username = :username", username = username)
                      friends_opponent = db.execute("SELECT friend FROM friends WHERE username = :username", username = opponent)
                      # If username = username and friend = opponent
-                     if opponent in friends_username:
-                        db.execute("UPDATE friends SET games = games + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
-                        # If username won the game
-                        if score_1 > score_2:
-                            db.execute("UPDATE friends SET won = won + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
-                        # If opponent won the game
-                        if score_2 > score_1:
-                            db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
+                     for dic in friends_username:
+                         if dic["friend"] == opponent:
+                            db.execute("UPDATE friends SET games = games + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
+                            # If username won the game
+                            if score_1 > score_2:
+                                db.execute("UPDATE friends SET won = won + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
+                            # If opponent won the game
+                            if score_2 > score_1:
+                                db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = username, friend = opponent)
                      # If username = opponent and friend = username
-                     if username in friends_opponent:
-                        db.execute("UPDATE friends SET games = games + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
-                        # If username won the game
-                        if score_1 > score_2:
-                            db.execute("UPDATE friends SET won = won + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
-                        # If opponent won the game
-                        if score_2 > score_1:
-                            db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
+                     for dic in friends_opponent:
+                         if dic["friend"] == username:
+                            db.execute("UPDATE friends SET games = games + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
+                            # If username won the game
+                            if score_1 < score_2:
+                                db.execute("UPDATE friends SET won = won + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
+                            # If opponent won the game
+                            if score_2 < score_1:
+                                db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
 
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
                      print(opponent, score_2, username, score_1)
