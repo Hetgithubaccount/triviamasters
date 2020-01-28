@@ -230,16 +230,19 @@ def start():
         elif request.form.get("opponent") and not request.form.get("number"):
             return apology("must provide code", 403)
         elif request.form.get("username"):
+            if request.form.get("q_amount"):
+                q_amount = int(request.form.get("q_amount"))
+            else:
+                q_amount = 10
             newgame = True
             while newgame:
                 code = random.randrange(100000, 999999)
-                result = db.execute("SELECT * FROM spel WHERE spelid=:code", code=code)
+                result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
                 if not result:
-                    db.execute("INSERT INTO spel (spelid, username, opponent, ronde, categorieën, score_1, score_2) VALUES (:spelid, :username, :opponent, :ronde, :categorieën, :score_1, :score_2)", spelid=code, username=request.form.get("username"), opponent="", ronde=1, categorieën="", score_1=0, score_2=0)
+                    db.execute("INSERT INTO codegames (gameid, username, opponent, score_1, score_2, q_amount, finished) VALUES (:gameid, :username, :opponent, :score_1, :score_2, :q_amount, :finished)", gameid=code, username=request.form.get("username"), opponent="", score_1=0, score_2=0, q_amount=q_amount, finished=0)
                     session["gameid"] = code
                     session["username"] = request.form.get("username")
                     return redirect("/gamewcode")
-
     else:
         return render_template("index.html")
 
@@ -248,11 +251,10 @@ def join():
     if request.method == "POST":
         if request.form.get("opponent") and request.form.get("number"):
             code = request.form.get("number")
-            result = db.execute("SELECT * FROM spel WHERE spelid=:code", code=code)
-            print(result)
+            result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
             if result:
                 if result[0]["opponent"] == "":
-                    db.execute("UPDATE spel SET opponent=:opponent WHERE spelid=:code", opponent=request.form.get("opponent"), code=code)
+                    db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code", opponent=request.form.get("opponent"), code=code)
                     session["gameid"] = code
                     session["username"] = request.form.get("opponent")
                     return redirect("/gamewcode")
@@ -330,7 +332,10 @@ def gamewcode():
             session["multiply"] = "X2"
         else: session["multiply"] = "X1"
         session["vraag"] += 1
-        if session["vraag"] == 10:
+        print(session["vraag"])
+        q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
+        print(q_amount)
+        if session["vraag"] == q_amount:
             session["vraag"] = 0
             return render_template("gamewcodeend.html")
         print(session["score"])
@@ -340,11 +345,11 @@ def gamewcode():
 @app.route("/gamewcodeend", methods=["GET", "POST"])
 def gamewcodeend():
     if request.method == "POST":
-        spelid = session["gameid"]
-        result1 = db.execute("SELECT score_1 FROM spel WHERE spelid=:spelid", spelid=spelid)
-        result2 = db.execute("SELECT score_2 FROM spel WHERE spelid=:spelid", spelid=spelid)
+        code = session["gameid"]
+        result1 = db.execute("SELECT score_1 FROM codegames WHERE gameid=:gameid", gameid=code)
+        result2 = db.execute("SELECT score_2 FROM codegames WHERE gameid=:gameid", gameid=code)
         if result1 != 0 and result2 !=0:
-            db.execute("DELETE * FROM spel WHERE spelid=:spelid", spelid=spelid)
+            db.execute("DELETE * FROM gamecodes WHERE gameid=:gameid", gameid=code)
             session.clear()
         return render_template("gamewcodeend.html")
     else:
