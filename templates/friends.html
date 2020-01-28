@@ -25,12 +25,14 @@
         <table style="width:100%" action="/friends" method="get">
           <tr>
             <th>Name</th>
+            <th>Games played</th>
             <th>Games won</th>
             <th>Games lost</th>
           </tr>
             {% for info in portfolio_contents %}
               <tr>
                 <td>{{ info.friend }}</td>
+                <td>{{ info.games }}</td>
                 <td>{{ info.won }}</td>
                 <td>{{ info.lose }}</td>
               </tr>
