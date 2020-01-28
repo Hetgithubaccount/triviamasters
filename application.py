@@ -11,7 +11,7 @@ import sqlite3
 import csv
 import requests
 
-from helpers import apology, login_required, vragen, user
+from helpers import apology, login_required, vragen, user, row_users
 import json
 
 # Configure application
@@ -61,10 +61,7 @@ def register():
         # checks if passwords match
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("password doesn't match", 400)
-
-        result = db.execute("SELECT * FROM users \
-                            WHERE username=:username", username=request.form.get("username"))
-
+        result = row_users(request.form.get("username"))
         # checks if username is in use
         if result:
             return apology("Username already exist", 400)
@@ -84,8 +81,7 @@ def register():
 @app.route("/checkusername", methods=["GET"])
 def checkusername():
     """Return true if username available/registered, else false, in JSON format"""
-    result = db.execute("SELECT * FROM users \
-                            WHERE username=:username", username=request.args.get("username"))
+    result = row_users( username=request.args.get("username"))
     if len(result) > 0:
         return jsonify(False)
     else:
@@ -96,9 +92,7 @@ def checkpassword():
     """Return true if password is correct, else false, in JSON format"""
     username = request.args.get("username")
     password = request.args.get("password")
-
-    result = db.execute("SELECT * FROM users \
-                            WHERE username=:username", username=username)
+    result = row_users(username)
 
     if check_password_hash(result[0]["hash"], password):
         return jsonify(False)
@@ -189,7 +183,7 @@ def addfriend():
         # Collects name of friend
         friendname = request.form.get("addusername")
         # Checks if username is legit
-        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("addusername"))
+        result = row_users( request.form.get("addusername"))
         if not result:
             return apology("user does not exist", 403)
         # Collects username
@@ -210,7 +204,7 @@ def delfriend():
         # Collects name of friend
         friendname = request.form.get("delusername")
         # Checks if username is legit
-        result = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("delusername"))
+        result= row_users(request.form.get("delusername"))
         if not result:
             return apology("user does not exist", 403)
         # Collects username
@@ -445,8 +439,7 @@ def gamewfriend():
         # Check if the form is not empty
         if not opponent:
              return apology("must insert friends username", 403)
-        # Get username with session_id
-        id = session["user_id"]
+        # Get username
         username = user()
         # Check in friends database if user has added opponent as friend
         friend = db.execute("SELECT friend FROM friends WHERE username = :username",
