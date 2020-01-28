@@ -438,6 +438,7 @@ def userpage():
 @app.route("/play", methods=["GET", "POST"])
 @login_required
 def gamewfriend():
+    #
     session["score"] = 0
     session["vraag"] = 0
     session["ronde"] = 1
@@ -529,11 +530,14 @@ def fspel():
         # After 10 questions the round is finished
         if session["vraag"] == 10:
             session["vraag"] = 0
+            # Get username of user
             id = session["user_id"]
             username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
+            # Get the endscore and the name of the person who started the game
             score = session["score"]
             naam = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)
             naam = naam[0]["username"]
+            # If the current user is the same as the player who started the game, get score_1 from spel and add the reached score. Also update round
             if naam == username:
                 score_oud = (db.execute("SELECT score_1 FROM spel WHERE gameid=:gameid", gameid=gameid))
                 score = score + score_oud[0]['score_1']
@@ -541,6 +545,7 @@ def fspel():
                 ronde_oud = db.execute("SELECT ronde_1 FROM spel WHERE gameid=:gameid", gameid=gameid)
                 ronde = ronde_oud[0]['ronde_1'] + 1
                 db.execute("UPDATE spel SET ronde_1 = :ronde, score_1 = :score WHERE gameid = :gameid", ronde=ronde, score=score, gameid=gameid)
+            # If the current user is not the game starter get score_2 from spel and update it with the reached score
             else:
                  score_oud= (db.execute("SELECT score_2 FROM spel WHERE gameid=:gameid", gameid=gameid))
                  score = score + score_oud[0]['score_2']
@@ -548,19 +553,18 @@ def fspel():
                  ronde_oud = db.execute("SELECT ronde_2 FROM spel WHERE gameid=:gameid", gameid=gameid)
                  ronde = ronde_oud[0]['ronde_2'] + 1
                  db.execute("UPDATE spel SET ronde_2 = :ronde, score_2 = :score WHERE gameid = :gameid", ronde=ronde, score=score, gameid=gameid)
-            ronde_2= (db.execute("SELECT ronde_2 FROM spel WHERE gameid=:gameid", gameid=gameid))
-            ronde_1= (db.execute("SELECT ronde_1 FROM spel WHERE gameid=:gameid", gameid=gameid))
-            ronde_1 = ronde_1[0]["ronde_1"]
-            ronde_2 = ronde_2[0]["ronde_2"]
+            # Get the amount of rounds the users has played. if the round is the same, the round index for userpage can be updated
+            ronde_2= (db.execute("SELECT ronde_2 FROM spel WHERE gameid=:gameid", gameid=gameid))[0]["ronde_2"]
+            ronde_1= (db.execute("SELECT ronde_1 FROM spel WHERE gameid=:gameid", gameid=gameid))[0]["ronde_1"]
             if ronde_2 == ronde_1:
                  ronde = ronde_1
                  db.execute("UPDATE spel SET ronde = :ronde WHERE gameid = :gameid", ronde=ronde, gameid=gameid)
-                 if ronde == 2:
+                 # If the players played 4 rounds get the endscores and the names of the players and insert the data in the table ended
+                 if ronde == 5:
                      score_1 = db.execute("SELECT score_1 FROM spel WHERE gameid = :gameid", gameid=gameid)[0]["score_1"]
                      score_2 = db.execute("SELECT score_2 FROM spel WHERE gameid = :gameid", gameid=gameid)[0]["score_2"]
                      opponent = db.execute("SELECT opponent FROM spel WHERE gameid=:gameid", gameid=gameid)[0]["opponent"]
                      username = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)[0]["username"]
-                    #  opponent = opponent[0]["opponent"]
                      db.execute("INSERT INTO ended (username, opponent, score_1, score_2, gameid) VALUES (:username, :opponent, :score_1, :score_2, :gameid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, gameid=gameid)
 
                      # Determines who is "username" and who is "friend" in database
@@ -586,13 +590,16 @@ def fspel():
                             # If opponent won the game
                             if score_2 < score_1:
                                 db.execute("UPDATE friends SET lose = lose + 1 WHERE username = :username and friend = :friend", username = opponent, friend = username)
-
+                     # Get the current highscores of the players
                      hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
                      hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
+                     # IF the score of the game maker is higher than his/her highscore, update
                      if score_1 > int(hscore_1):
                          db.execute("UPDATE users SET highscore = :score_1 WHERE username = :username", score_1= score_1, username=username)
+                     # If the score of the game joiner is higher than his/her highscore, update
                      if score_2 > int(hscore_2):
                          db.execute("UPDATE users SET highscore = :score_2 WHERE username = :opponent", score_2=score_2, opponent=opponent)
+                     # Delete the game
                      db.execute("DELETE FROM spel WHERE gameid = :gameid", gameid=gameid)
                      return redirect("/userpage")
             return redirect("/userpage")
@@ -604,16 +611,19 @@ def leaderbords():
     if request.method == "POST":
         return render_template("leaderboards.html")
     else:
+        # Get all highscores from the database users
         hscores= db.execute("SELECT highscore, username FROM users")
-        users= db.execute("SELECT count(*) FROM users")[0]["count(*)"]
+        # Make a list with the numbers 1 till 10
         user_count = []
         for i in range(11):
             if i > 0:
                 user_count.append(i)
 
-
+        # Sort the highscores from highest to lowest and select the best 10
         hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))[:10]
+        # Zip the lists together to make a the jinja forloop possible
         rangschikking = zip(hscores,user_count)
+        # Send the lists to leaderboards.html
         return render_template("leaderboards.html", rangschikking=rangschikking)
 
 @app.route("/about", methods=["GET", "POST"])
@@ -627,11 +637,11 @@ def about():
 @login_required
 def rspel():
     if request.method == "post":
-        gameid = request.form.get("delete")
-        db.execute("DELETE FROM spel WHERE gameid = :gameid", gameid = gameid)
         return render_template("userpage.html")
     else:
+        # Get value(gameid) from the clicked button
         gameid = request.form.get("delete")
+        # Delete game from database
         db.execute("DELETE FROM spel WHERE gameid = :gameid", gameid = gameid)
         return redirect("/userpage")
 
@@ -639,9 +649,9 @@ def rspel():
 @login_required
 def doorverwijs():
     if request.method == "post":
-        session["gameid"] = request.form.get("id")
         return render_template("spel.html")
     else:
+        # Get value(gameid) from the clicked button, and save the gameid in session
         session["gameid"] = request.form.get("id")
         return render_template("doorverwijs.html")
 
