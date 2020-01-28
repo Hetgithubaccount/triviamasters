@@ -65,10 +65,12 @@ def register():
         result = db.execute("SELECT * FROM users \
                             WHERE username=:username", username=request.form.get("username"))
 
+        # checks if username is in use
         if result:
             return apology("Username already exist", 400)
+
+        # creates user
         highscore = 0
-        #creates user
         session["user_id"] = db.execute("INSERT INTO users (username, hash, highscore) \
                              VALUES(:username, :hash, :highscore)", \
                              username=request.form.get("username"), \
@@ -194,8 +196,8 @@ def addfriend():
         # Collects username
         username = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])[0]["username"]
         # Database insert and reset of games/wins/losses
-        db.execute("INSERT INTO friends (username, friend, games, won, lose) VALUES (:username, :friend, :games, :won, :lose)", username = username,
-                                                                                                friend = friendname, games = 0, won = 0, lose = 0)
+        db.execute("INSERT INTO friends (username, friend, games, won, lose)  \
+                    VALUES (:username, :friend, :games, :won, :lose)", username = username, friend = friendname, games = 0, won = 0, lose = 0)
         return redirect("/friends")
     else:
         return render_template("friends.html")
@@ -229,23 +231,34 @@ def start():
     session["streak"] = 0
     session["multiply"] = "X1"
     if request.method == "POST":
+        # Starts a singleplayer game
         if request.form.get("singleplayer"):
             return render_template("game.html")
+
+        # Checks for correct input
         elif not request.form.get("username") and not request.form.get("opponent"):
             return apology("must provide username", 403)
         elif request.form.get("opponent") and not request.form.get("number"):
             return apology("must provide code", 403)
+
+        # Starts a game with code
         elif request.form.get("username"):
+            # Determines amount of questions
             if request.form.get("q_amount"):
                 q_amount = int(request.form.get("q_amount"))
             else:
                 q_amount = 10
+
+            # Database entry for gamewcode
             newgame = True
             while newgame:
                 code = random.randrange(100000, 999999)
                 result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
                 if not result:
-                    db.execute("INSERT INTO codegames (gameid, username, opponent, score_1, score_2, q_amount, finished) VALUES (:gameid, :username, :opponent, :score_1, :score_2, :q_amount, :finished)", gameid=code, username=request.form.get("username"), opponent="", score_1=0, score_2=0, q_amount=q_amount, finished=0)
+                    db.execute("INSERT INTO codegames (gameid, username, opponent, score_1, score_2, q_amount, finished)  \
+                                VALUES (:gameid, :username, :opponent, :score_1, :score_2, :q_amount, :finished)",   \
+                                gameid=code, username=request.form.get("username"), opponent="", score_1=0, score_2=0,   \
+                                q_amount=q_amount, finished=0)
                     session["gameid"] = code
                     session["username"] = request.form.get("username")
                     return redirect("/gamewcode")
@@ -260,7 +273,8 @@ def join():
             result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
             if result:
                 if result[0]["opponent"] == "":
-                    db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code", opponent=request.form.get("opponent"), code=code)
+                    db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
+                                opponent=request.form.get("opponent"), code=code)
                     session["gameid"] = code
                     session["username"] = request.form.get("opponent")
                     return redirect("/gamewcode")
@@ -331,6 +345,7 @@ def singlegameend():
 @app.route("/gamewcode", methods=["GET", "POST"])
 def gamewcode():
     if request.method == "GET":
+        # Sets up the gamepage
         quest = vragen()
         question = quest[0]
         coranswer = quest[1]
@@ -339,28 +354,28 @@ def gamewcode():
         username = session["username"]
         code = session["gameid"]
         session["coranswer"] = coranswer
-        return render_template("gamewcode.html", question=question, answerlist=answerlist, coranswer=coranswer, categ=categ, code=code, username=username)
+        return render_template("gamewcode.html", question=question, answerlist=answerlist,  \
+                                coranswer=coranswer, categ=categ, code=code, username=username)
 
     if request.method == "POST":
+        # Checks answer and handles accordingly
         ingevuld = str(request.form.get("answer"))
         if ingevuld == session["coranswer"]:
             session["score"] += 1
             session["streak"] += 1
         else:
             session["streak"] = 0
-            print("goed")
         if session["streak"] >= 3:
             session["score"] += 1
             session["multiply"] = "X2"
         else: session["multiply"] = "X1"
         session["vraag"] += 1
-        print(session["vraag"])
+
+        # Checks if game is completed
         q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
-        print(q_amount)
         if session["vraag"] == q_amount:
             session["vraag"] = 0
             return render_template("gamewcodeend.html")
-        print(session["score"])
 
         return redirect("/gamewcode")
 
@@ -380,7 +395,10 @@ def gamewcodeend():
 
 def vragen():
     response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
-    apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple", "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple", "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple", "animals": "https://opentdb.com/api.php?amount=49&category=27&type=multiple"}
+    apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple",  \
+            "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple",  \
+            "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple",  \
+            "animals": "https://opentdb.com/api.php?amount=49&category=27&type=multiple"}
     api = random.choice(list(apis.keys()))
     response = requests.get(apis[api])
     sport = response.json()
