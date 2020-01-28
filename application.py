@@ -369,11 +369,8 @@ def gamewcode():
             session["multiply"] = "X2"
         else: session["multiply"] = "X1"
         session["vraag"] += 1
-<<<<<<< HEAD
 
         # Checks if game is completed
-=======
->>>>>>> d0662be2aa309f08a0a5b61b7de1a51053f6d9e6
         q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
         if session["vraag"] == q_amount:
             session["vraag"] = 0
