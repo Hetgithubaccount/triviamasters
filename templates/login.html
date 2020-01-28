@@ -5,16 +5,67 @@
 {% endblock %}
 
 {% block main %}
-    <field>
-        <form action="/login" method="post">
-            <h3>Log in</h3>
+    <script>
+        function validateForm() {
+          var username = document.forms["myFormlogin"]["username"].value;
+          if (username == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkusername",
+                data: { "username": username},
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == true){
+                  alert("Username not registered");
+                  return false;
+               }
+          }
+        }
+    </script>
+    <script>
+        function validatepass() {
+          var username = document.forms["myFormlogin"]["username"].value;
+          var password = document.forms["myFormlogin"]["password"].value;
+          if (password == "") {
+            alert("password must be filled out");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkpassword",
+                data: { "password": password, "username": username },
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == true){
+                  alert("Password is not correct");
+                  return false;
+               }
+          }
+        }
+    </script>
+    <form name="myFormlogin" onsubmit="return validateForm(), validatepass()" action="{{ url_for('login') }}" method="post">
+        <h3>Log in</h3>
             <div class="form-group">
                 <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
             </div>
             <div class="form-group">
                 <input class="form-control" name="password" placeholder="Password" type="password">
             </div>
-            <button class="btn btn-primary" type="submit">Log In</button>
-        </form>
-    </field>
+        <button class="btn btn-primary" type="submit">Log In</button>
+    </form>
 {% endblock %}
