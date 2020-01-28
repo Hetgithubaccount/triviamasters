@@ -433,6 +433,7 @@ def gamewfriend():
     session["score"] = 0
     session["vraag"] = 0
     session["round"] = 1
+    session["multiply"] = "X1"
     if request.method == "POST":
         # Get opponent name from form
         opponent = request.form.get("f-opponent")
