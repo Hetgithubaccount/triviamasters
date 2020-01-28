@@ -381,12 +381,6 @@ def gamewcode():
 @app.route("/gamewcodeend", methods=["GET", "POST"])
 def gamewcodeend():
     if request.method == "POST":
-        code = session["gameid"]
-        result1 = db.execute("SELECT score_1 FROM codegames WHERE gameid=:gameid", gameid=code)
-        result2 = db.execute("SELECT score_2 FROM codegames WHERE gameid=:gameid", gameid=code)
-        if result1 != 0 and result2 !=0:
-            db.execute("DELETE * FROM gamecodes WHERE gameid=:gameid", gameid=code)
-            session.clear()
         return render_template("gamewcodeend.html")
     else:
         return render_template("gamewcodeend.html")
@@ -649,6 +643,30 @@ def doorverwijs():
 @app.route("/result", methods=["GET", "POST"])
 def result():
     if request.method == "post":
+        code = session["gameid"]
+
+        result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
+        result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
+        if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
+            session["score_2"] = result2
+            if result2 > result1:
+                session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
+            elif result1 > result2:
+                session["winner"] = session["username"]
+            else:
+                session["winner"] = "Draw"
+        else:
+            session["score_2"] = result1
+            if result1 > result2:
+                session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
+            elif result2 > result1:
+                session["winner"] = session["username"]
+            else:
+                session["winner"] = "Draw"
+
+        if result1 != 0 and result2 !=0:
+            db.execute("DELETE * FROM gamecodes WHERE gameid=:gameid", gameid=code)
+            session.clear()
         return render_template("result.html")
     else:
         return render_template("result.html")
