@@ -2,11 +2,12 @@ import requests
 import urllib.parse
 import os
 import random
-
+import sqlite3
 from flask import redirect, render_template, request, session
 from functools import wraps
+from cs50 import SQL
 
-
+db = SQL("sqlite:///trivia.db")
 def apology(message, code=400):
     """Render message as an apology to user."""
     def escape(s):
@@ -53,3 +54,13 @@ def vragen():
     answerlist.append(coranswer)
     # print(coranswer)
     return [question, coranswer, answerlist, category]
+
+def user():
+    id = session["user_id"]
+    username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
+    return username
+
+def row_users(username):
+    result = db.execute("SELECT * FROM users \
+                            WHERE username=:username", username=username)
+    return result
