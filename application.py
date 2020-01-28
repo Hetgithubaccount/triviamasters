@@ -605,10 +605,12 @@ def leaderbords():
         hscores= db.execute("SELECT highscore, username FROM users")
         users= db.execute("SELECT count(*) FROM users")[0]["count(*)"]
         user_count = []
-        for i in range(users + 1):
+        for i in range(11):
             if i > 0:
                 user_count.append(i)
-        hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))
+
+
+        hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))[:10]
         rangschikking = zip(hscores,user_count)
         return render_template("leaderboards.html", rangschikking=rangschikking)
 
