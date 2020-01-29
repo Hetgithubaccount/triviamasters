@@ -5,13 +5,39 @@
 {% endblock %}
 
 {% block main %}
-<field>
-<form action="/play" method="post">
+    <script>
+        function validateFormplay() {
+          var friend = document.forms["playwfriend"]["f-opponent"].value;
+          if (friend == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkplay",
+                data: { "friend": friend },
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == false){
+                  alert("Friend does not exist or already has a game with you");
+                  return false;
+               }
+          }
+        }
+    </script>
+    <field>
+        <form name="playwfriend" onsubmit="return validateFormplay()" action="/play" method="post">
             <h3>Play with a friend</h3>
             <div class="form-group">
                 <input autocomplete="off" autofocus class="form-control" name="f-opponent" placeholder="Insert friends name" type="text">
             </div>
             <button class="btn btn-primary" type="submit">Invite</button>
         </form>
-</field>
+    </field>
 {% endblock %}

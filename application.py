@@ -144,6 +144,35 @@ def checkdelfriend():
                 return jsonify(True)
     return jsonify(False)
 
+
+@app.route("/checkplay", methods=["GET"])
+def checkplay():
+    """Return true if a game can be started against friend, in JSON format"""
+    friend = request.args.get("friend")
+    username = session["username"]
+    result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
+    result2 = db.execute("SELECT * FROM friends WHERE friend=:username", username=username)
+    trivia1 = db.execute("SELECT * FROM game WHERE username=:username AND opponent=:friend", username=username, friend=friend)
+    trivia2 = db.execute("SELECT * FROM game WHERE username=:friend AND opponent=:username", friend=friend, username=username)
+    if friend == username:
+        return jsonify(False)
+    if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
+        return jsonify(False)
+    print(db.execute("SELECT * FROM users WHERE username=:username", username=friend))
+    if result1:
+        print(result1)
+        for res in result1:
+            if res["friend"] == friend:
+                if trivia1 or trivia2:
+                    return jsonify(False)
+    if result2:
+        print(result2)
+        for res in result2:
+            if res["friend"] == friend:
+                if trivia1 or trivia2:
+                    return jsonify(False)
+    return jsonify(True)
+
 @app.route("/checkcode", methods=["GET"])
 def checkcode():
     """Return true if code in use/used, else false, in JSON format"""
