@@ -38,8 +38,6 @@ def login_required(f):
 
 def questions():
     """ Get random question from api, and sort all values  """
-
-    # response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
     apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple",  \
             "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple",  \
             "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple",  \
