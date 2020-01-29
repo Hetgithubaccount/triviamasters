@@ -77,7 +77,7 @@ def register():
 
 @app.route("/checkusername", methods=["GET"])
 def checkusername():
-    """Return true if username available/registered, else false, in JSON format"""
+    """Return true if username available, else false, in JSON format"""
     result = row_users( username=request.args.get("username"))
     if len(result) > 0:
         return jsonify(False)
@@ -98,7 +98,7 @@ def checkpassword():
 
 @app.route("/checkaddfriend", methods=["GET"])
 def checkaddfriend():
-    """Return true if friend can be added, in JSON format"""
+    """Return true if friend can be added, else false, in JSON format"""
     friend = request.args.get("friend")
     username = session["username"]
     result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
@@ -107,14 +107,11 @@ def checkaddfriend():
         return jsonify(False)
     if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
         return jsonify(False)
-    print(db.execute("SELECT * FROM users WHERE username=:username", username=friend))
     if result1:
-        print(result1)
         for res in result1:
             if res["friend"] == friend:
                 return jsonify(False)
     if result2:
-        print(result2)
         for res in result2:
             if res["friend"] == friend:
                 return jsonify(False)
@@ -122,7 +119,7 @@ def checkaddfriend():
 
 @app.route("/checkdelfriend", methods=["GET"])
 def checkdelfriend():
-    """Return true if friend can be deleted, in JSON format"""
+    """Return true if friend can be deleted, else false, in JSON format"""
     friend = request.args.get("friend")
     username = session["username"]
     result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
@@ -131,14 +128,11 @@ def checkdelfriend():
         return jsonify(False)
     if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
         return jsonify(False)
-    print(db.execute("SELECT * FROM users WHERE username=:username", username=friend))
     if result1:
-        print(result1)
         for res in result1:
             if res["friend"] == friend:
                 return jsonify(True)
     if result2:
-        print(result2)
         for res in result2:
             if res["friend"] == friend:
                 return jsonify(True)
@@ -147,7 +141,7 @@ def checkdelfriend():
 
 @app.route("/checkplay", methods=["GET"])
 def checkplay():
-    """Return true if a game can be started against friend, in JSON format"""
+    """Return true if a game can be started against friend, else false, in JSON format"""
     friend = request.args.get("friend")
     username = session["username"]
     result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
@@ -158,15 +152,12 @@ def checkplay():
         return jsonify(False)
     if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
         return jsonify(False)
-    print(db.execute("SELECT * FROM users WHERE username=:username", username=friend))
     if result1:
-        print(result1)
         for res in result1:
             if res["friend"] == friend:
                 if trivia1 or trivia2:
                     return jsonify(False)
     if result2:
-        print(result2)
         for res in result2:
             if res["friend"] == friend:
                 if trivia1 or trivia2:
@@ -470,6 +461,9 @@ def gamewcode():
             else:
                 db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
                                 score=session["score"], code=session["gameid"])
+            finished = int(db.execute("SELECT * FROM codegames WHERE gameid=:code", code=session["gameid"])[0]["finished"]) + 1
+            db.execute("UPDATE codegames SET finished=:finished WHERE gameid=:code",  \
+                                finished=finished, code=session["gameid"])
             return render_template("gamewcodeend.html")
 
         return redirect("/gamewcode")
@@ -494,7 +488,6 @@ def result():
         result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
         if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
             session["score_2"] = result2
-            print(session["score_2"])
             if result2 > result1:
                 session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
             elif result1 > result2:
@@ -510,7 +503,6 @@ def result():
             else:
                 session["winner"] = "It's a draw"
         finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
-
         if finished == 2:
             db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
             session.clear()
