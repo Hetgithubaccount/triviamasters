@@ -553,7 +553,7 @@ def friendgame():
         answerlist = set(quest[2])
         categ = quest[3]
         session["coranswer"] = coranswer
-        # Return the data of the question to friendspel.html
+        # Return the data of the question to friendgame.html
         return render_template("friendgame.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
     # If the player clicks on an answer
     if request.method == "POST":
