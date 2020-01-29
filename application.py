@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
@@ -10,7 +9,7 @@ import random
 import sqlite3
 import csv
 import requests
-
+import time
 from helpers import apology, login_required, questions, user, row_users
 import json
 
@@ -40,8 +39,7 @@ Session(app)
 
 games = list()
 singlegameplayers = dict()
-import csv
-import time
+
 db = SQL("sqlite:///trivia.db")
 
 
