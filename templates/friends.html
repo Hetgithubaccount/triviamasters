@@ -5,9 +5,35 @@
 {% endblock %}
 
 {% block main %}
+    <script>
+        function validateFormadd() {
+          var friend = document.forms["myFormaddfriend"]["addusername"].value;
+          if (friend == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkfriend",
+                data: { "friend": friend },
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == true){
+                  alert("Friend does not exist or is already your friend");
+                  return false;
+               }
+          }
+        }
+    </script>
     <field>
         <h3>Add friend</h3>
-        <form action="/addfriend" method="post">
+        <form name="myFormaddfriend" onsubmit="return validateFormadd()" action="/addfriend" method="post">
             <div class="form-start">
                 <input autocomplete="off" autofocus class="form-start" name="addusername" placeholder="Username" type="text">
             </div>
