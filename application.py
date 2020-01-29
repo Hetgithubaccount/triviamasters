@@ -232,7 +232,7 @@ def delfriend():
 def start():
     """ Displays homepage and sets values for later use in games """
     session["score"] = 0
-    session["vraag"] = 0
+    session["question"] = 0
     session["streak"] = 0
     session["multiply"] = "X1"
     if request.method == "POST":
@@ -331,10 +331,10 @@ def startsinglegame():
         # Graphic when user has no answer streak
         else: session["multiply"] = "X1"
         # Question amount is updated
-        session["vraag"] += 1
+        session["question"] += 1
         # Ends game if 10 questions have been answered
-        if session["vraag"] == 10:
-            session["vraag"] = 0
+        if session["question"] == 10:
+            session["question"] = 0
             return render_template("singlegameend.html")
         # Restarts and generates new question
         return redirect("/game")
@@ -380,12 +380,12 @@ def gamewcode():
             session["multiply"] = "X2"
         else:
             session["multiply"] = "X1"
-        session["vraag"] += 1
+        session["question"] += 1
 
         # Checks if game is completed
         q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
-        if session["vraag"] == q_amount:
-            session["vraag"] = 0
+        if session["question"] == q_amount:
+            session["question"] = 0
             if session["username"] == db.execute("SELECT username FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["username"]:
                 db.execute("UPDATE codegames SET score_1=:score WHERE gameid=:code",  \
                                 score=session["score"], code=session["gameid"])
@@ -469,7 +469,7 @@ def userpage():
         for i in game:
             row.append((i["username"],i["round"], i["score_2"], i["score_1"], i["gameid"]))
         session["score"] = 0
-        session["vraag"] = 0
+        session["question"] = 0
         session["streak"] = 0
         ended = []
         end1 = db.execute("SELECT * FROM ended WHERE username= :username", username=username)
@@ -490,7 +490,7 @@ def gamewfriend():
     """ Starts up game with friend, then forwards to game """
     #get session values for score amount of questions and the current round
     session["score"] = 0
-    session["vraag"] = 0
+    session["question"] = 0
     session["round"] = 1
     session["multiply"] = "X1"
     if request.method == "POST":
@@ -519,8 +519,7 @@ def gamewfriend():
         score_1 = 0
         score_2 = 0
         round = 1
-        categorieën = ""
-        db.execute("INSERT INTO game (username, opponent, round_1, round_2, round, score_1, score_2, categorieën) VALUES (:username, :opponent, :round_1, :round_2, :round, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, round_1=round_1, round_2=round_2, round=round,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
+        db.execute("INSERT INTO game (username, opponent, round_1, round_2, round, score_1, score_2) VALUES (:username, :opponent, :round_1, :round_2, :round, :score_1, :score_2)", username=username, opponent=opponent, round_1=round_1, round_2=round_2, round=round,score_1=score_1 ,score_2=score_2)
         gameid = db.execute("SELECT gameid FROM game WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
         session["gameid"] = gameid[0]["gameid"]
         return redirect(url_for('fspel'))
@@ -574,7 +573,7 @@ def fspel():
         else:
             session["streak"] = 0
         # The answered question count + 1
-        session["vraag"] += 1
+        session["question"] += 1
         # Check if streak is more than 3 to activate multiplier (correct answer is 2 points)
         if session["streak"] >= 3:
             session["score"] += 1
@@ -582,8 +581,8 @@ def fspel():
         else:
             session["multiply"] = "X1"
         # After 10 questions the round is finished
-        if session["vraag"] == 10:
-            session["vraag"] = 0
+        if session["question"] == 10:
+            session["question"] = 0
             # Get username of user
             username = user()
             # Get the endscore and the name of the person who started the game
