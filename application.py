@@ -47,6 +47,22 @@ def register():
     """ Enables user to create account """
     if request.method == "POST":
 
+        # Checks if username is filled in
+        if not request.form.get("username"):
+            return apology("must provide username", 400)
+
+        # Checks if password was filled in
+        elif not request.form.get("password"):
+            return apology("must provide password", 400)
+
+        # Checks if passwords match
+        elif request.form.get("password") != request.form.get("confirmation"):
+            return apology("password doesn't match", 400)
+        result = row_users(request.form.get("username"))
+        # Checks if username is in use
+        if result:
+            return apology("Username already exist", 400)
+
         # Creates user
         highscore = 0
         session["user_id"] = db.execute("INSERT INTO users (username, hash, highscore) \
@@ -171,6 +187,14 @@ def login():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username",
                           username=request.form.get("username"))
@@ -238,6 +262,10 @@ def addfriend():
 
         # Collects name of friend
         friendname = request.form.get("addusername")
+        # Checks if username is legit
+        result = row_users( request.form.get("addusername"))
+        if not result:
+            return apology("user does not exist", 403)
         # Collects username
         username = user()
         # Database insert and reset of games/wins/losses
@@ -255,6 +283,10 @@ def delfriend():
 
         # Collects name of friend
         friendname = request.form.get("delusername")
+        # Checks if username is legit
+        result= row_users(request.form.get("delusername"))
+        if not result:
+            return apology("user does not exist", 403)
         # Collects username
         username = user()
         # Deletes friend (both cases are covered, so both users can delete the friendship)
@@ -276,6 +308,12 @@ def start():
         # Starts a singleplayer game
         if request.form.get("singleplayer"):
             return render_template("game.html")
+
+        # Checks for correct input
+        elif not request.form.get("username") and not request.form.get("opponent"):
+            return apology("must provide username", 403)
+        elif request.form.get("opponent") and not request.form.get("number"):
+            return apology("must provide code", 403)
 
         # Starts a game with code
         elif request.form.get("username"):
@@ -306,13 +344,22 @@ def start():
 def join():
     """ Enables user to join a game through a code """
     if request.method == "POST":
-        code = request.form.get("number")
-        # Sets player as opponent
-        db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
-                    opponent=request.form.get("opponent"), code=code)
-        session["gameid"] = code
-        session["username"] = request.form.get("opponent")
-        return redirect("/gamewcode")
+        if request.form.get("opponent") and request.form.get("number"):
+            code = request.form.get("number")
+            result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
+            if result:
+                if result[0]["opponent"] == "":
+                    db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
+                                opponent=request.form.get("opponent"), code=code)
+                    session["gameid"] = code
+                    session["username"] = request.form.get("opponent")
+                    return redirect("/gamewcode")
+                else:
+                    return apology("already 2 players in game", 403)
+            else:
+                return apology("enter valid code", 403)
+        else:
+            return render_template("index.html")
     else:
         return render_template("index.html")
 
@@ -455,7 +502,20 @@ def result():
                 session["winner"] = session["username"]
             else:
                 session["winner"] = "It's a draw"
+        finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
+        if finished == 2:
+            db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
+            session.clear()
         return render_template("result.html")
+
+@app.route("/eind", methods=["GET", "POST"])
+def eind():
+    """ Singleplayer ending page """
+    if request.method == "POST":
+        session.clear()
+        return redirect("/")
+    else:
+        return render_template("eind.html")
 
 def errorhandler(e):
     """Handle error"""
@@ -506,8 +566,23 @@ def gamewfriend():
     if request.method == "POST":
         # Get opponent name from form
         opponent = request.form.get("f-opponent")
+        # Check if the form is not empty
+        if not opponent:
+             return apology("must insert friends username", 403)
         # Get username
         username = user()
+        # Check in friends database if user has added opponent as friend
+        friend = db.execute("SELECT friend FROM friends WHERE username = :username",
+                          username=username)
+        friend2 = db.execute("SELECT username FROM friends WHERE friend = :username",
+                          username=username)
+        # Check if players are friends
+        if not friend and not friend2:
+             return apology("must add opponent as friend", 403)
+        # Query in game if players already playing a game against each other at the moment
+        current_game = db.execute("SELECT gameid FROM game WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
+        if current_game:
+            return apology("you can only play 1 game per friend at the moment", 403)
         # Make a new game in the database
         round_1 = 1
         round_2 = 1
@@ -517,13 +592,13 @@ def gamewfriend():
         db.execute("INSERT INTO game (username, opponent, round_1, round_2, round, score_1, score_2) VALUES (:username, :opponent, :round_1, :round_2, :round, :score_1, :score_2)", username=username, opponent=opponent, round_1=round_1, round_2=round_2, round=round,score_1=score_1 ,score_2=score_2)
         gameid = db.execute("SELECT gameid FROM game WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
         session["gameid"] = gameid[0]["gameid"]
-        return redirect(url_for('friendgame'))
+        return redirect(url_for('fspel'))
     else:
         return render_template("gamewfriend.html")
 
-@app.route("/friendgame", methods=["GET", "POST"])
+@app.route("/spel", methods=["GET", "POST"])
 @login_required
-def friendgame():
+def fspel():
     """ Multiplayer with a friend """
     if request.method == "GET":
         # Get username of user
@@ -554,7 +629,7 @@ def friendgame():
         categ = quest[3]
         session["coranswer"] = coranswer
         # Return the data of the question to friendspel.html
-        return render_template("friendgame.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
+        return render_template("friendspel.html", question=question, answerlist=answerlist, coranswer=coranswer, categ = categ)
     # If the player clicks on an answer
     if request.method == "POST":
         # Get gameid
@@ -650,7 +725,7 @@ def friendgame():
                     db.execute("DELETE FROM game WHERE gameid = :gameid", gameid=gameid)
                     return redirect("/userpage")
             return redirect("/userpage")
-        return redirect("/friendgame")
+        return redirect("/spel")
 
 @app.route("/leaderboards", methods=["GET", "POST"])
 @login_required
@@ -682,9 +757,9 @@ def about():
     else:
         return render_template("about.html")
 
-@app.route("/rgame", methods=["GET", "POST"])
+@app.route("/rspel", methods=["GET", "POST"])
 @login_required
-def rgame():
+def rspel():
     """ Enables user to delete a game from user homepage """
     if request.method == "post":
         return render_template("userpage.html")
@@ -695,15 +770,15 @@ def rgame():
         db.execute("DELETE FROM game WHERE gameid = :gameid", gameid = gameid)
         return redirect("/userpage")
 
-@app.route("/refer", methods=["GET", "POST"])
+@app.route("/doorverwijs", methods=["GET", "POST"])
 @login_required
-def refer():
+def doorverwijs():
     """ Pick up an open game from user homepage """
     if request.method == "post":
-        return render_template("friendgame.html")
+        return render_template("spel.html")
     else:
         # Get value(gameid) from the clicked button, and save the gameid in session
         session["gameid"] = request.form.get("id")
-        return render_template("refer.html")
+        return render_template("doorverwijs.html")
 
 
