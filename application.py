@@ -305,16 +305,13 @@ def start():
 def join():
     """ Enables user to join a game through a code """
     if request.method == "POST":
-        if request.form.get("opponent") and request.form.get("number"):
-            code = request.form.get("number")
-            db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
-                        opponent=request.form.get("opponent"), code=code)
-            session["gameid"] = code
-            session["username"] = request.form.get("opponent")
-            return redirect("/gamewcode")
-
-        else:
-            return render_template("index.html")
+        # sets opponent for a game
+        code = request.form.get("number")
+        db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
+                    opponent=request.form.get("opponent"), code=code)
+        session["gameid"] = code
+        session["username"] = request.form.get("opponent")
+        return redirect("/gamewcode")
     else:
         return render_template("index.html")
 
@@ -474,6 +471,7 @@ def userpage():
         username = user()
         opponent = username
         row = []
+        # Shows all games currently active
         game1 = db.execute("SELECT * FROM game WHERE username= :username", username=username)
         game = db.execute("SELECT * FROM game WHERE opponent= :opponent", opponent=opponent)
         for i in game1:
@@ -484,6 +482,7 @@ def userpage():
         session["question"] = 0
         session["streak"] = 0
         ended = []
+        # Show all games that have been played
         end1 = db.execute("SELECT * FROM ended WHERE username= :username", username=username)
         end2 = db.execute("SELECT * FROM ended WHERE opponent= :opponent", opponent=opponent)
         for i in end1:
