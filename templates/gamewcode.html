@@ -6,7 +6,9 @@
 
 {% block main %}
      <field>
-          <h2 id= "code"> Code: {{code}}</h2>
+          <h2 id= "code" style="font-weight:bold;"> Code: {{code}}</h2>
+     </field>
+     <field>
           <h2 id= "category"> Category: {{categ}}</h2>
           <H2 class = "question" style="font-weight:bold;"> Question: {{question | safe}}</H2>
           <form action="/gamewcode" method="post">
