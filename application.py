@@ -369,7 +369,7 @@ def gamewcode():
         if session["vraag"] == q_amount:
             session["vraag"] = 0
             if session["username"] == db.execute("SELECT username FROM gamecodes WHERE gameid=:gameid", gameid=code):
-                db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
+                db.execute("UPDATE codegames SET score_1=:score WHERE gameid=:code",  \
                                 score=session["score"], code=code)
             else:
                 db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
