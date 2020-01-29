@@ -52,7 +52,7 @@ def register():
                              VALUES(:username, :hash, :highscore)", \
                              username=request.form.get("username"), \
                              hash=generate_password_hash(request.form.get("password")), highscore=highscore)
-
+        session["username"] = request.form.get("username")
         return render_template("userpage.html")
 
     else:
@@ -532,7 +532,7 @@ def friendgame():
         username = user()
         # Get gameid
         gameid= session["gameid"]
-        session["round"] = db.execute("SELECT round FROM game WHERE gameid= :gameid", gameid=gameid)[0]["round"]
+        session["round"] = db.execute("SELECT * FROM game WHERE gameid= :gameid", gameid=gameid)[0]["round"]
         name = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)
         round_1 = db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid)
         round_2 = db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid)
@@ -584,7 +584,7 @@ def friendgame():
             username = user()
             # Get the endscore and the name of the person who started the game
             score = session["score"]
-            name = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)
+            name = db.execute("SELECT * FROM game WHERE gameid=:gameid", gameid=gameid)
             name = name[0]["username"]
             # If the current user is the same as the player who started the game, get score_1 from game and add the reached score. Also update round
             if name == username:
