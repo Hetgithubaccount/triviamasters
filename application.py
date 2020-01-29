@@ -160,6 +160,29 @@ def checkcode():
     else:
         return jsonify(True)
 
+@app.route("/checkround", methods=["GET"])
+def checkround():
+    """Return true if rounds are both played, else false, in JSON format"""
+    username = session["username"]
+    gameid = request.args.get("gameid")
+    session["round"] = db.execute("SELECT * FROM game WHERE gameid= :gameid", gameid=gameid)[0]["round"]
+    name = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)
+    round_1 = db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid)
+    round_2 = db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid)
+    round_1 = round_1[0]["round_1"]
+    round_2 = round_2[0]["round_2"]
+    name = name[0]["username"]
+    if name == username:
+        # Checks if player one is in the same round as player 2
+        if round_1 > round_2:
+            return jsonify(False)
+        else:
+            return jsonify(True)
+    elif round_2 > round_1:
+        return jsonify(False)
+    else:
+        return jsonify(True)
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -213,7 +236,7 @@ def findfriends():
         # Collects others that invited user to be friend (necessary because of database columns)
         reversefriends = db.execute("SELECT * FROM friends WHERE friend = :friend", friend = username)
         # Swaps variables when user is "friend" in db to make sure information is displayed correctly,
-        # e.g. swaps names and amount of wins/losses
+        # E.g. swaps names and amount of wins/losses
         for i in reversefriends:
             dude = i["username"]
             i["username"] = i["friend"]
@@ -305,7 +328,7 @@ def start():
 def join():
     """ Enables user to join a game through a code """
     if request.method == "POST":
-        # sets opponent for a game
+        # Sets opponent for a game
         code = request.form.get("number")
         db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
                     opponent=request.form.get("opponent"), code=code)
@@ -499,7 +522,7 @@ def userpage():
 @login_required
 def gamewfriend():
     """ Starts up game with friend, then forwards to game """
-    #get session values for score amount of questions and the current round
+    # Get session values for score amount of questions and the current round
     session["score"] = 0
     session["question"] = 0
     session["round"] = 1
@@ -529,24 +552,6 @@ def friendgame():
     if request.method == "GET":
         # Get username of user
         username = user()
-        # Get gameid
-        gameid= session["gameid"]
-        session["round"] = db.execute("SELECT * FROM game WHERE gameid= :gameid", gameid=gameid)[0]["round"]
-        name = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)
-        round_1 = db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid)
-        round_2 = db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid)
-        round_1 = round_1[0]["round_1"]
-        round_2 = round_2[0]["round_2"]
-        name = name[0]["username"]
-        if name == username:
-            # Checks if player one is in the same round as player 2
-            if round_1 > round_2:
-                return apology("wait till opponent has played the previous round", 403)
-        else:
-            if round_2 > round_1:
-                return apology("wait till opponent has played the previous round", 403)
-
-
         # Collects question and uses indexation to grab each individual part of the database output
         quest = questions()
         question = quest[0]
@@ -641,7 +646,7 @@ def friendgame():
                     # Get the current highscores of the players
                     hscore_1 = db.execute("SELECT highscore FROM users WHERE username= :username", username=username)[0]["highscore"]
                     hscore_2 = db.execute("SELECT highscore FROM users WHERE username= :opponent", opponent=opponent)[0]["highscore"]
-                    # IF the score of the game maker is higher than his/her highscore, update
+                    # If the score of the game maker is higher than his/her highscore, update
                     if score_1 > int(hscore_1):
                         db.execute("UPDATE users SET highscore = :score_1 WHERE username = :username", score_1= score_1, username=username)
                     # If the score of the game joiner is higher than his/her highscore, update

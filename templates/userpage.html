@@ -5,6 +5,26 @@
 {% endblock %}
 
 {% block main %}
+<script>
+  function validateFormround() {
+    var gameid = document.forms["play"]["id"].value;
+    var check = false;
+    jQuery.get({
+    url: "/checkround",
+    data: { "gameid": gameid },
+    success:
+      function(data){
+        check=data;
+      },
+    async: false,
+    dataType: "json"
+    });
+    if (check == false){
+      alert("Friend needs to play a round first");
+      return false;
+    }
+  }
+</script>
 <div>
 <h2>Your current games</h2>
 </div>
@@ -26,8 +46,8 @@
                   <td>{{data[2]}}</td>
                    <td>{{data[3]}}</td>
                 <td>
-                    <form action="/refer" method="post">
-                    <button class="btn btn-primary" name="id" value="{{data[4]}}" type="submit">Play</button>
+                    <form name="play" onsubmit="return validateFormround()" action="/refer" method="post">
+                      <button class="btn btn-primary" name="id" value="{{data[4]}}" type="submit">Play</button>
                     </form>
                 </td>
                 <td>
