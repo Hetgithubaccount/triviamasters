@@ -655,11 +655,12 @@ def doorverwijs():
 @app.route("/result", methods=["GET", "POST"])
 def result():
     if request.method == "post":
+        return render_template("result.html")
+    else:
         code = session["gameid"]
 
         result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
         result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
-        print(result1, result2, "HIEEEEEER")
         if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
             session["score_2"] = result2
             print(session["score_2"])
@@ -682,6 +683,4 @@ def result():
         if finished == 2:
             db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
             session.clear()
-        return render_template("result.html")
-    else:
         return render_template("result.html")
