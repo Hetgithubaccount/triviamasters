@@ -5,6 +5,16 @@
 {% endblock %}
 
 {% block main %}
+    <script>
+        function validateForm() {
+          var username = document.forms["myFormgamewcode"]["username"].value;
+          var q_amount = document.forms["myFormgamewcode"]["q_amount"].value;
+          if (username == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+        }
+    </script>
     <field>
         <h3>Singleplayer Mode</h3>
         <form action="/game" method="get">
@@ -13,10 +23,10 @@
     </field>
     <field>
         <h3>Start multiplayer game</h3>
-        <form action="/" method="post">
+        <form name="myFormgamewcode" onsubmit="return validateForm()" action="/" method="post">
             <div class="form-start">
                 <input autocomplete="off" autofocus class="form-start" name="username" placeholder="Name" type="text">
-                <input autocomplete="off" autofocus class="form-start" name="q_amount" placeholder="Amount of questions = 10" type="text">
+                <input autocomplete="off" autofocus class="form-start" name="q_amount" placeholder="Number of questions = 10" type="number" min="1" max="100">
             </div>
             <button class="btn btn-primary" class= "form-start" type="submit">Start game</button>
         </form>

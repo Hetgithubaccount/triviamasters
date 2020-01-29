@@ -98,7 +98,6 @@ def checkpassword():
     else:
         return jsonify(True)
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
