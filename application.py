@@ -360,19 +360,20 @@ def gamewcode():
         if session["streak"] >= 3:
             session["score"] += 1
             session["multiply"] = "X2"
-        else: session["multiply"] = "X1"
+        else:
+            session["multiply"] = "X1"
         session["vraag"] += 1
 
         # Checks if game is completed
         q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
         if session["vraag"] == q_amount:
             session["vraag"] = 0
-            if session["username"] == db.execute("SELECT username FROM gamecodes WHERE gameid=:gameid", gameid=code):
+            if session["username"] == db.execute("SELECT username FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["username"]:
                 db.execute("UPDATE codegames SET score_1=:score WHERE gameid=:code",  \
-                                score=session["score"], code=code)
+                                score=session["score"], code=session["gameid"])
             else:
                 db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
-                                score=session["score"], code=code)
+                                score=session["score"], code=session["gameid"])
             return render_template("gamewcodeend.html")
 
         return redirect("/gamewcode")
@@ -653,12 +654,15 @@ def doorverwijs():
 @app.route("/result", methods=["GET", "POST"])
 def result():
     if request.method == "post":
+        return render_template("result.html")
+    else:
         code = session["gameid"]
 
         result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
         result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
         if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
             session["score_2"] = result2
+            print(session["score_2"])
             if result2 > result1:
                 session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
             elif result1 > result2:
@@ -672,12 +676,10 @@ def result():
             elif result2 > result1:
                 session["winner"] = session["username"]
             else:
-                session["winner"] = "Draw"
+                session["winner"] = "It's a draw"
         finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
 
         if finished == 2:
-            db.execute("DELETE * FROM gamecodes WHERE gameid=:gameid", gameid=code)
+            db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
             session.clear()
-        return render_template("result.html")
-    else:
         return render_template("result.html")
