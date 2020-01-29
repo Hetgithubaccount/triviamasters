@@ -82,10 +82,12 @@ def checkpassword():
 @app.route("/checkaddfriend", methods=["GET"])
 def checkaddfriend():
     """Return true if friend can be added, else false, in JSON format"""
+    # Retrieves all friends from database
     friend = request.args.get("friend")
     username = session["username"]
     result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
     result2 = db.execute("SELECT * FROM friends WHERE friend=:username", username=username)
+    # Checks if submit is vailable for adding as friend
     if friend == username:
         return jsonify(False)
     if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
@@ -103,10 +105,12 @@ def checkaddfriend():
 @app.route("/checkdelfriend", methods=["GET"])
 def checkdelfriend():
     """Return true if friend can be deleted, else false, in JSON format"""
+    # Retrieves all friends from database
     friend = request.args.get("friend")
     username = session["username"]
     result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
     result2 = db.execute("SELECT * FROM friends WHERE friend=:username", username=username)
+    # Checks if submit is vailable for removing as friend
     if friend == username:
         return jsonify(False)
     if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
@@ -125,12 +129,14 @@ def checkdelfriend():
 @app.route("/checkplay", methods=["GET"])
 def checkplay():
     """Return true if a game can be started against friend, else false, in JSON format"""
+    # Retrieves all games from database
     friend = request.args.get("friend")
     username = session["username"]
     result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
     result2 = db.execute("SELECT * FROM friends WHERE friend=:username", username=username)
     trivia1 = db.execute("SELECT * FROM game WHERE username=:username AND opponent=:friend", username=username, friend=friend)
     trivia2 = db.execute("SELECT * FROM game WHERE username=:friend AND opponent=:username", friend=friend, username=username)
+    # Checks for submit if possible to start a new game
     if friend == username:
         return jsonify(False)
     if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
@@ -163,6 +169,7 @@ def checkcode():
 @app.route("/checkround", methods=["GET"])
 def checkround():
     """Return true if rounds are both played, else false, in JSON format"""
+    # Retrieves game data from database
     username = session["username"]
     gameid = request.args.get("gameid")
     session["round"] = db.execute("SELECT * FROM game WHERE gameid= :gameid", gameid=gameid)[0]["round"]
@@ -172,8 +179,8 @@ def checkround():
     round_1 = round_1[0]["round_1"]
     round_2 = round_2[0]["round_2"]
     name = name[0]["username"]
+    # Checks if player one is in the same round as player 2
     if name == username:
-        # Checks if player one is in the same round as player 2
         if round_1 > round_2:
             return jsonify(False)
         else:
@@ -458,9 +465,10 @@ def result():
         return render_template("result.html")
     else:
         code = session["gameid"]
-
+        # Checks who won the game
         result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
         result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
+        # Saves who won
         if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
             session["score_2"] = result2
             if result2 > result1:
