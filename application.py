@@ -361,19 +361,20 @@ def gamewcode():
         if session["streak"] >= 3:
             session["score"] += 1
             session["multiply"] = "X2"
-        else: session["multiply"] = "X1"
+        else:
+            session["multiply"] = "X1"
         session["vraag"] += 1
 
         # Checks if game is completed
         q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
         if session["vraag"] == q_amount:
             session["vraag"] = 0
-            if session["username"] == db.execute("SELECT username FROM gamecodes WHERE gameid=:gameid", gameid=code):
+            if session["username"] == db.execute("SELECT username FROM codegames WHERE gameid=:gameid", gameid=session["gameid"]):
                 db.execute("UPDATE codegames SET score_1=:score WHERE gameid=:code",  \
-                                score=session["score"], code=code)
+                                score=session["score"], code=session["gameid"])
             else:
                 db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
-                                score=session["score"], code=code)
+                                score=session["score"], code=session["gameid"])
             return render_template("gamewcodeend.html")
 
         return redirect("/gamewcode")
@@ -677,7 +678,7 @@ def result():
         finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
 
         if finished == 2:
-            db.execute("DELETE * FROM gamecodes WHERE gameid=:gameid", gameid=code)
+            db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
             session.clear()
         return render_template("result.html")
     else:
