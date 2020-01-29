@@ -708,7 +708,7 @@ def fspel():
 
 @app.route("/leaderboards", methods=["GET", "POST"])
 @login_required
-def leaderbords():
+def leaderboards():
     """ Shows highest scoring users """
     if request.method == "POST":
         return render_template("leaderboards.html")
