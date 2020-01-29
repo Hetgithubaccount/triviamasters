@@ -344,22 +344,12 @@ def start():
 def join():
     """ Enables user to join a game through a code """
     if request.method == "POST":
-        if request.form.get("opponent") and request.form.get("number"):
-            code = request.form.get("number")
-            result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
-            if result:
-                if result[0]["opponent"] == "":
-                    db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
-                                opponent=request.form.get("opponent"), code=code)
-                    session["gameid"] = code
-                    session["username"] = request.form.get("opponent")
-                    return redirect("/gamewcode")
-                else:
-                    return apology("already 2 players in game", 403)
-            else:
-                return apology("enter valid code", 403)
-        else:
-            return render_template("index.html")
+        code = request.form.get("number")
+        db.execute("UPDATE codegames SET opponent=:opponent WHERE gameid=:code",  \
+                    opponent=request.form.get("opponent"), code=code)
+        session["gameid"] = code
+        session["username"] = request.form.get("opponent")
+        return redirect("/gamewcode")
     else:
         return render_template("index.html")
 
@@ -504,7 +494,8 @@ def result():
                 session["winner"] = "It's a draw"
         finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
         if finished == 2:
-            db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
+            db.execute("DELETE FROM codegames WHERE gameid=:gameid", gameid=code)
+            time.sleep(20)
             session.clear()
         return render_template("result.html")
 
