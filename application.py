@@ -96,6 +96,19 @@ def checkpassword():
     else:
         return jsonify(True)
 
+@app.route("/checkcode", methods=["GET"])
+def checkcode():
+    """Return true if code in use/used, else false, in JSON format"""
+    code = request.args.get("code")
+    result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
+    if result:
+        if result[0]["opponent"] == "":
+            return jsonify(False)
+        else:
+            return jsonify(True)
+    else:
+        return jsonify(True)
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""

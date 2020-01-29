@@ -15,7 +15,41 @@
           }
         }
     </script>
+<<<<<<< HEAD
     <link rel="preload" as="image" href="background.jpg">
+=======
+    <script>
+        function validateFormjoin() {
+          var username = document.forms["myFormgamewcodejoin"]["opponent"].value;
+          var code = document.forms["myFormgamewcodejoin"]["number"].value;
+          if (username == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+          else if (code == "") {
+            alert("Code must be filled in");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkcode",
+                data: { "code": code },
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == true){
+                  alert("Code is not in use or game is already full");
+                  return false;
+               }
+          }
+        }
+    </script>
+>>>>>>> 133f2a82261217d4097fedc305646edcfe103843
     <field>
         <h3>Singleplayer mode</h3>
         <form action="/game" method="get">
@@ -32,7 +66,7 @@
             <button class="btn btn-primary" class= "form-start" type="submit">Start game</button>
         </form>
         <h3>Join game</h3>
-        <form action="/join" method="post">
+        <form name="myFormgamewcodejoin" onsubmit="return validateFormjoin()" action="/join" method="post">
             <div class="form-join">
                 <input autocomplete="off" autofocus class="form-join" name="opponent" placeholder="Name" type="text">
             <div class="form-join">
