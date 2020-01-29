@@ -338,7 +338,6 @@ def join():
     else:
         return render_template("index.html")
 
-# Checked for code quality 28/01/2019 by Nathan
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
     """ Singleplayer mode """
@@ -383,7 +382,6 @@ def startsinglegame():
         # Restarts and generates new question
         return redirect("/game")
 
-# Checked for code quality 28/01/2019 by Nathan
 @app.route("/singlegameend", methods=["GET", "POST"])
 def singlegameend():
     """ Clears information from singleplayer game """
