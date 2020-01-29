@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    fspel
+    friendgame
 {% endblock %}
 
 {% block main %}
 <field>
-          <h3> ronde: {{session["ronde"]}}</h3>
+          <h3> round: {{session["round"]}}</h3>
           <h2 id= "category"> Category: {{categ}}</h2>
           <H2 class = "question" style="font-weight:bold;"> Question: {{question | safe}}</H2>
-          <form action="/spel" method="post">
+          <form action="/friendgame" method="post">
           <div>
           {%for option in answerlist%}
           <button id="quesbutton" class="btn default" name="answer" type="submit" value="{{ option}}">{{option | safe}}</button>
