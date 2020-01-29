@@ -58,6 +58,7 @@
           }
         }
     </script>
+    <field>
     <form name="myFormlogin" onsubmit="return validateForm(), validatepass()" action="{{ url_for('login') }}" method="post">
         <h3>Log in</h3>
             <div class="form-group">
@@ -68,4 +69,5 @@
             </div>
         <button class="btn btn-primary" type="submit">Log In</button>
     </form>
+    </field>
 {% endblock %}
