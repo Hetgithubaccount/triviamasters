@@ -44,29 +44,28 @@ import csv
 import time
 db = SQL("sqlite:///trivia.db")
 
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
-
+    """ Enables user to create account """
     if request.method == "POST":
 
-        # checks if username is filled in
+        # Checks if username is filled in
         if not request.form.get("username"):
             return apology("must provide username", 400)
 
-        # checks if password was filled in
+        # Checks if password was filled in
         elif not request.form.get("password"):
             return apology("must provide password", 400)
 
-        # checks if passwords match
+        # Checks if passwords match
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("password doesn't match", 400)
         result = row_users(request.form.get("username"))
-        # checks if username is in use
+        # Checks if username is in use
         if result:
             return apology("Username already exist", 400)
 
-        # creates user
+        # Creates user
         highscore = 0
         session["user_id"] = db.execute("INSERT INTO users (username, hash, highscore) \
                              VALUES(:username, :hash, :highscore)", \
@@ -146,10 +145,11 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-# Checked for code quality 28/01/2019 by Nathan
+
 @app.route("/friends", methods=["GET", "POST"])
 @login_required
 def findfriends():
+    """ Collects user's friends from database """
     if request.method == "GET":
 
         # Collects username
@@ -174,10 +174,11 @@ def findfriends():
     else:
         return render_template("friends.html")
 
-# Checked for code quality 28/01/2019 by Nathan
+
 @app.route("/addfriend", methods=["GET", "POST"])
 @login_required
 def addfriend():
+    """ Enables user to add friend """
     if request.method == "POST":
 
         # Collects name of friend
@@ -195,10 +196,10 @@ def addfriend():
     else:
         return render_template("friends.html")
 
-# Checked for code quality 28/01/2019 by Nathan
 @app.route("/delfriend", methods=["GET", "POST"])
 @login_required
 def delfriend():
+    """ Enables user to delete friend """
     if request.method == "POST":
 
         # Collects name of friend
@@ -219,6 +220,7 @@ def delfriend():
 
 @app.route("/", methods=["GET", "POST"])
 def start():
+    """ Displays homepage and sets values for later use in games """
     session["score"] = 0
     session["vraag"] = 0
     session["streak"] = 0
@@ -247,6 +249,7 @@ def start():
             while newgame:
                 code = random.randrange(100000, 999999)
                 result = db.execute("SELECT * FROM codegames WHERE gameid=:code", code=code)
+                # Makes a new game in database
                 if not result:
                     db.execute("INSERT INTO codegames (gameid, username, opponent, score_1, score_2, q_amount, finished)  \
                                 VALUES (:gameid, :username, :opponent, :score_1, :score_2, :q_amount, :finished)",   \
@@ -260,6 +263,7 @@ def start():
 
 @app.route("/join", methods=["GET", "POST"])
 def join():
+    """ Enables user to join a game through a code """
     if request.method == "POST":
         if request.form.get("opponent") and request.form.get("number"):
             code = request.form.get("number")
