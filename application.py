@@ -676,7 +676,7 @@ def result():
             elif result2 > result1:
                 session["winner"] = session["username"]
             else:
-                session["winner"] = "Draw"
+                session["winner"] = "It's a draw"
         finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
 
         if finished == 2:
