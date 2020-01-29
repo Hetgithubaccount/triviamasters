@@ -286,6 +286,7 @@ def join():
 # Checked for code quality 28/01/2019 by Nathan
 @app.route("/game", methods=["GET", "POST"])
 def startsinglegame():
+    """ Singleplayer mode """
     if request.method == "GET":
 
         # Collects question and uses indexation to grab each individual part of the database output
@@ -330,6 +331,7 @@ def startsinglegame():
 # Checked for code quality 28/01/2019 by Nathan
 @app.route("/singlegameend", methods=["GET", "POST"])
 def singlegameend():
+    """ Clears information from singleplayer game """
     if request.method == "POST":
         # Clears question information
         session.clear()
@@ -340,6 +342,7 @@ def singlegameend():
 
 @app.route("/gamewcode", methods=["GET", "POST"])
 def gamewcode():
+    """ Multiplayer with a code """
     if request.method == "GET":
         # Sets up the gamepage
         quest = questions()
@@ -384,13 +387,49 @@ def gamewcode():
 
 @app.route("/gamewcodeend", methods=["GET", "POST"])
 def gamewcodeend():
+    """ Game with code ending page """
     if request.method == "POST":
         return render_template("gamewcodeend.html")
     else:
         return render_template("gamewcodeend.html")
 
+@app.route("/result", methods=["GET", "POST"])
+def result():
+    """ Shows winner and scores from a code multiplayer game """
+    if request.method == "post":
+        return render_template("result.html")
+    else:
+        code = session["gameid"]
+
+        result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
+        result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
+        if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
+            session["score_2"] = result2
+            print(session["score_2"])
+            if result2 > result1:
+                session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
+            elif result1 > result2:
+                session["winner"] = session["username"]
+            else:
+                session["winner"] = "Draw"
+        else:
+            session["score_2"] = result1
+            if result1 > result2:
+                session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
+            elif result2 > result1:
+                session["winner"] = session["username"]
+            else:
+                session["winner"] = "It's a draw"
+        finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
+
+        if finished == 2:
+            db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
+            session.clear()
+        return render_template("result.html")
+
 @app.route("/eind", methods=["GET", "POST"])
 def eind():
+    """ Singleplayer ending page """
     if request.method == "POST":
         session.clear()
         return redirect("/")
@@ -407,6 +446,7 @@ def errorhandler(e):
 @app.route("/userpage", methods=["GET", "POST"])
 @login_required
 def userpage():
+    """ Shows personal homepage with current and previous games """
     if request.method == "GET":
         username = user()
         opponent = username
@@ -436,6 +476,7 @@ def userpage():
 @app.route("/play", methods=["GET", "POST"])
 @login_required
 def gamewfriend():
+    """ Starts up game with friend, then forwards to game """
     #get session values for score amount of questions and the current round
     session["score"] = 0
     session["vraag"] = 0
@@ -478,6 +519,7 @@ def gamewfriend():
 @app.route("/spel", methods=["GET", "POST"])
 @login_required
 def fspel():
+    """ Multiplayer with a friend """
     if request.method == "GET":
         # Get username of user
         username = user()
@@ -608,6 +650,7 @@ def fspel():
 @app.route("/leaderboards", methods=["GET", "POST"])
 @login_required
 def leaderbords():
+    """ Shows highest scoring users """
     if request.method == "POST":
         return render_template("leaderboards.html")
     else:
@@ -628,6 +671,7 @@ def leaderbords():
 
 @app.route("/about", methods=["GET", "POST"])
 def about():
+    """ Displays a "how to play" page """
     if request.method == "POST":
         return render_template("about.html")
     else:
@@ -636,6 +680,7 @@ def about():
 @app.route("/rspel", methods=["GET", "POST"])
 @login_required
 def rspel():
+    """ Enables user to delete a game from user homepage """
     if request.method == "post":
         return render_template("userpage.html")
     else:
@@ -648,6 +693,7 @@ def rspel():
 @app.route("/doorverwijs", methods=["GET", "POST"])
 @login_required
 def doorverwijs():
+    """ Pick up an open game from user homepage """
     if request.method == "post":
         return render_template("spel.html")
     else:
@@ -655,35 +701,4 @@ def doorverwijs():
         session["gameid"] = request.form.get("id")
         return render_template("doorverwijs.html")
 
-@app.route("/result", methods=["GET", "POST"])
-def result():
-    if request.method == "post":
-        return render_template("result.html")
-    else:
-        code = session["gameid"]
 
-        result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
-        result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
-        if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
-            session["score_2"] = result2
-            print(session["score_2"])
-            if result2 > result1:
-                session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
-            elif result1 > result2:
-                session["winner"] = session["username"]
-            else:
-                session["winner"] = "Draw"
-        else:
-            session["score_2"] = result1
-            if result1 > result2:
-                session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
-            elif result2 > result1:
-                session["winner"] = session["username"]
-            else:
-                session["winner"] = "It's a draw"
-        finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
-
-        if finished == 2:
-            db.execute("DELETE * FROM codegames WHERE gameid=:gameid", gameid=code)
-            session.clear()
-        return render_template("result.html")
