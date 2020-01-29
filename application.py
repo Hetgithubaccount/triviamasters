@@ -401,15 +401,12 @@ def userpage():
         username = user()
         opponent = username
         row = []
-        idee = []
-        spell = db.execute("SELECT * FROM spel WHERE username= :username", username=username)
-        spel = db.execute("SELECT * FROM spel WHERE opponent= :opponent", opponent=opponent)
-        for i in spell:
+        game1 = db.execute("SELECT * FROM game WHERE username= :username", username=username)
+        game = db.execute("SELECT * FROM game WHERE opponent= :opponent", opponent=opponent)
+        for i in game1:
             row.append((i["opponent"],i["round"], i["score_1"], i["score_2"], i["gameid"]))
-            idee.append((i["gameid"]))
-        for i in spel:
+        for i in game:
             row.append((i["username"],i["round"], i["score_2"], i["score_1"], i["gameid"]))
-            idee.append((i["gameid"]))
         session["score"] = 0
         session["vraag"] = 0
         session["streak"] = 0
@@ -422,7 +419,7 @@ def userpage():
         for i in end2:
             a= [i["username"], i["score_2"], i["score_1"]]
             ended.append(a)
-        return render_template("userpage.html", spell=spell, idee=idee, spel=spel, row=row, ended=ended)
+        return render_template("userpage.html", row=row, ended=ended)
     else:
         return render_template("userpage.html")
 
@@ -450,8 +447,8 @@ def gamewfriend():
         # Check if players are friends
         if not friend and not friend2:
              return apology("must add opponent as friend", 403)
-        # Query in spel if players already playing a game against each other at the moment
-        current_game = db.execute("SELECT gameid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
+        # Query in game if players already playing a game against each other at the moment
+        current_game = db.execute("SELECT gameid FROM game WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
         if current_game:
             return apology("you can only play 1 game per friend at the moment", 403)
         # Make a new game in the database
@@ -461,8 +458,8 @@ def gamewfriend():
         score_2 = 0
         round = 1
         categorieën = ""
-        db.execute("INSERT INTO spel (username, opponent, round_1, round_2, round, score_1, score_2, categorieën) VALUES (:username, :opponent, :round_1, :round_2, :round, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, round_1=round_1, round_2=round_2, round=round,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
-        gameid = db.execute("SELECT gameid FROM spel WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
+        db.execute("INSERT INTO game (username, opponent, round_1, round_2, round, score_1, score_2, categorieën) VALUES (:username, :opponent, :round_1, :round_2, :round, :score_1, :score_2, :categorieën)", username=username, opponent=opponent, round_1=round_1, round_2=round_2, round=round,score_1=score_1 ,score_2=score_2, categorieën=categorieën)
+        gameid = db.execute("SELECT gameid FROM game WHERE username= :username AND opponent = :opponent", username=username, opponent=opponent )
         session["gameid"] = gameid[0]["gameid"]
         return redirect(url_for('fspel'))
     else:
@@ -476,10 +473,10 @@ def fspel():
         username = user()
         # Get gameid
         gameid= session["gameid"]
-        session["round"] = db.execute("SELECT round FROM spel WHERE gameid= :gameid", gameid=gameid)[0]["round"]
-        name = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)
-        round_1 = db.execute("SELECT round_1 FROM spel WHERE gameid=:gameid", gameid=gameid)
-        round_2 = db.execute("SELECT round_2 FROM spel WHERE gameid=:gameid", gameid=gameid)
+        session["round"] = db.execute("SELECT round FROM game WHERE gameid= :gameid", gameid=gameid)[0]["round"]
+        name = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)
+        round_1 = db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid)
+        round_2 = db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid)
         round_1 = round_1[0]["round_1"]
         round_2 = round_2[0]["round_2"]
         name = name[0]["username"]
@@ -528,36 +525,36 @@ def fspel():
             username = user()
             # Get the endscore and the name of the person who started the game
             score = session["score"]
-            name = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)
+            name = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)
             name = name[0]["username"]
-            # If the current user is the same as the player who started the game, get score_1 from spel and add the reached score. Also update round
+            # If the current user is the same as the player who started the game, get score_1 from game and add the reached score. Also update round
             if name == username:
-                score_old = (db.execute("SELECT score_1 FROM spel WHERE gameid=:gameid", gameid=gameid))
+                score_old = (db.execute("SELECT score_1 FROM game WHERE gameid=:gameid", gameid=gameid))
                 score = score + score_old[0]['score_1']
                 session["score_1"] = score
-                round_old = db.execute("SELECT round_1 FROM spel WHERE gameid=:gameid", gameid=gameid)
+                round_old = db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid)
                 round = round_old[0]['round_1'] + 1
-                db.execute("UPDATE spel SET round_1 = :round, score_1 = :score WHERE gameid = :gameid", round=round, score=score, gameid=gameid)
-            # If the current user is not the game starter get score_2 from spel and update it with the reached score
+                db.execute("UPDATE game SET round_1 = :round, score_1 = :score WHERE gameid = :gameid", round=round, score=score, gameid=gameid)
+            # If the current user is not the game starter get score_2 from game and update it with the reached score
             else:
-                score_old= (db.execute("SELECT score_2 FROM spel WHERE gameid=:gameid", gameid=gameid))
+                score_old= (db.execute("SELECT score_2 FROM game WHERE gameid=:gameid", gameid=gameid))
                 score = score + score_old[0]['score_2']
                 session["score_2"] = score
-                round_old = db.execute("SELECT round_2 FROM spel WHERE gameid=:gameid", gameid=gameid)
+                round_old = db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid)
                 round = round_old[0]['round_2'] + 1
-                db.execute("UPDATE spel SET round_2 = :round, score_2 = :score WHERE gameid = :gameid", round=round, score=score, gameid=gameid)
+                db.execute("UPDATE game SET round_2 = :round, score_2 = :score WHERE gameid = :gameid", round=round, score=score, gameid=gameid)
             # Get the amount of rounds the users has played. if the round is the same, the round index for userpage can be updated
-            round_2= (db.execute("SELECT round_2 FROM spel WHERE gameid=:gameid", gameid=gameid))[0]["round_2"]
-            round_1= (db.execute("SELECT round_1 FROM spel WHERE gameid=:gameid", gameid=gameid))[0]["round_1"]
+            round_2= (db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid))[0]["round_2"]
+            round_1= (db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid))[0]["round_1"]
             if round_2 == round_1:
                 round = round_1
-                db.execute("UPDATE spel SET round = :round WHERE gameid = :gameid", round=round, gameid=gameid)
+                db.execute("UPDATE game SET round = :round WHERE gameid = :gameid", round=round, gameid=gameid)
                 # If the players played 4 rounds get the endscores and the names of the players and insert the data in the table ended
                 if round == 5:
-                    score_1 = db.execute("SELECT score_1 FROM spel WHERE gameid = :gameid", gameid=gameid)[0]["score_1"]
-                    score_2 = db.execute("SELECT score_2 FROM spel WHERE gameid = :gameid", gameid=gameid)[0]["score_2"]
-                    opponent = db.execute("SELECT opponent FROM spel WHERE gameid=:gameid", gameid=gameid)[0]["opponent"]
-                    username = db.execute("SELECT username FROM spel WHERE gameid=:gameid", gameid=gameid)[0]["username"]
+                    score_1 = db.execute("SELECT score_1 FROM game WHERE gameid = :gameid", gameid=gameid)[0]["score_1"]
+                    score_2 = db.execute("SELECT score_2 FROM game WHERE gameid = :gameid", gameid=gameid)[0]["score_2"]
+                    opponent = db.execute("SELECT opponent FROM game WHERE gameid=:gameid", gameid=gameid)[0]["opponent"]
+                    username = db.execute("SELECT username FROM game WHERE gameid=:gameid", gameid=gameid)[0]["username"]
                     db.execute("INSERT INTO ended (username, opponent, score_1, score_2, gameid) VALUES (:username, :opponent, :score_1, :score_2, :gameid)" ,username=username, opponent=opponent, score_1=score_1, score_2=score_2, gameid=gameid)
 
                     # Determines who is "username" and who is "friend" in database
@@ -593,7 +590,7 @@ def fspel():
                     if score_2 > int(hscore_2):
                         db.execute("UPDATE users SET highscore = :score_2 WHERE username = :opponent", score_2=score_2, opponent=opponent)
                     # Delete the game
-                    db.execute("DELETE FROM spel WHERE gameid = :gameid", gameid=gameid)
+                    db.execute("DELETE FROM game WHERE gameid = :gameid", gameid=gameid)
                     return redirect("/userpage")
             return redirect("/userpage")
         return redirect("/spel")
@@ -635,7 +632,7 @@ def rspel():
         # Get value(gameid) from the clicked button
         gameid = request.form.get("delete")
         # Delete game from database
-        db.execute("DELETE FROM spel WHERE gameid = :gameid", gameid = gameid)
+        db.execute("DELETE FROM game WHERE gameid = :gameid", gameid = gameid)
         return redirect("/userpage")
 
 @app.route("/doorverwijs", methods=["GET", "POST"])
