@@ -659,8 +659,10 @@ def result():
 
         result1 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_1"]
         result2 = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["score_2"]
+        print(result1, result2, "HIEEEEEER")
         if session["username"] == db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["username"]:
             session["score_2"] = result2
+            print(session["score_2"])
             if result2 > result1:
                 session["winner"] = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["opponent"]
             elif result1 > result2:
