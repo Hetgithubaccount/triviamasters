@@ -96,6 +96,54 @@ def checkpassword():
     else:
         return jsonify(True)
 
+@app.route("/checkaddfriend", methods=["GET"])
+def checkaddfriend():
+    """Return true if friend can be added, in JSON format"""
+    friend = request.args.get("friend")
+    username = session["username"]
+    result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
+    result2 = db.execute("SELECT * FROM friends WHERE friend=:username", username=username)
+    if friend == username:
+        return jsonify(False)
+    if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
+        return jsonify(False)
+    print(db.execute("SELECT * FROM users WHERE username=:username", username=friend))
+    if result1:
+        print(result1)
+        for res in result1:
+            if res["friend"] == friend:
+                return jsonify(False)
+    if result2:
+        print(result2)
+        for res in result2:
+            if res["friend"] == friend:
+                return jsonify(False)
+    return jsonify(True)
+
+@app.route("/checkdelfriend", methods=["GET"])
+def checkdelfriend():
+    """Return true if friend can be deleted, in JSON format"""
+    friend = request.args.get("friend")
+    username = session["username"]
+    result1 = db.execute("SELECT * FROM friends WHERE username=:username", username=username)
+    result2 = db.execute("SELECT * FROM friends WHERE friend=:username", username=username)
+    if friend == username:
+        return jsonify(False)
+    if not db.execute("SELECT * FROM users WHERE username=:username", username=friend):
+        return jsonify(False)
+    print(db.execute("SELECT * FROM users WHERE username=:username", username=friend))
+    if result1:
+        print(result1)
+        for res in result1:
+            if res["friend"] == friend:
+                return jsonify(True)
+    if result2:
+        print(result2)
+        for res in result2:
+            if res["friend"] == friend:
+                return jsonify(True)
+    return jsonify(False)
+
 @app.route("/checkcode", methods=["GET"])
 def checkcode():
     """Return true if code in use/used, else false, in JSON format"""
@@ -137,6 +185,7 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
+        session["username"] = rows[0]["username"]
 
         # Redirect user to home page
         return redirect("/userpage")

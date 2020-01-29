@@ -15,7 +15,7 @@
           else {
               var check = false;
               jQuery.get({
-                url: "/checkfriend",
+                url: "/checkaddfriend",
                 data: { "friend": friend },
                 success:
                     function(data){
@@ -24,7 +24,33 @@
                 async: false,
                 dataType: "json"
                });
-               if (check == true){
+               if (check == false){
+                  alert("Friend does not exist or is already your friend");
+                  return false;
+               }
+          }
+        }
+    </script>
+    <script>
+        function validateFormdel() {
+          var friend = document.forms["myFormdelfriend"]["delusername"].value;
+          if (friend == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+          else {
+              var check = false;
+              jQuery.get({
+                url: "/checkdelfriend",
+                data: { "friend": friend },
+                success:
+                    function(data){
+                        check=data;
+                    },
+                async: false,
+                dataType: "json"
+               });
+               if (check == false){
                   alert("Friend does not exist or is already your friend");
                   return false;
                }
@@ -40,7 +66,7 @@
             <button class="btn btn-primary" class= "form-start" name="addfriend" type="submit">Add</button>
         </form>
         <h3>Get rid of friend</h3>
-        <form action="/delfriend" method="post">
+        <form name="myFormdelfriend" onsubmit="return validateFormdel()" action="/delfriend" method="post">
             <div class="form-start">
                 <input autocomplete="off" autofocus class="form-start" name="delusername" placeholder="Username" type="text">
             </div>
