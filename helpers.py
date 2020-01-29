@@ -37,7 +37,9 @@ def login_required(f):
     return decorated_function
 
 def questions():
-    response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
+    """ Get random question from api, and sort all values  """
+
+    # response = requests.get("https://opentdb.com/api.php?amount=49&category=21&type=multiple")
     apis = {"sport":"https://opentdb.com/api.php?amount=49&category=21&type=multiple",  \
             "geography": "https://opentdb.com/api.php?amount=49&category=22&type=multiple",  \
             "history":"https://opentdb.com/api.php?amount=49&category=23&type=multiple",  \
@@ -52,15 +54,16 @@ def questions():
     coranswer = sequence["correct_answer"]
     answerlist = sequence["incorrect_answers"]
     answerlist.append(coranswer)
-    # print(coranswer)
     return [question, coranswer, answerlist, category]
 
 def user():
+    """ Get username from database with session id"""
     id = session["user_id"]
     username = db.execute("SELECT username FROM users WHERE id = :id", id=id)[0]["username"]
     return username
 
 def row_users(username):
+    """Get row in table users"""
     result = db.execute("SELECT * FROM users \
                             WHERE username=:username", username=username)
     return result
