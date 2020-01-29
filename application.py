@@ -368,6 +368,12 @@ def gamewcode():
         q_amount = db.execute("SELECT q_amount FROM codegames WHERE gameid=:gameid", gameid=session["gameid"])[0]["q_amount"]
         if session["vraag"] == q_amount:
             session["vraag"] = 0
+            if session["username"] == db.execute("SELECT username FROM gamecodes WHERE gameid=:gameid", gameid=code):
+                db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
+                                score=session["score"], code=code)
+            else:
+                db.execute("UPDATE codegames SET score_2=:score WHERE gameid=:code",  \
+                                score=session["score"], code=code)
             return render_template("gamewcodeend.html")
 
         return redirect("/gamewcode")
@@ -668,8 +674,9 @@ def result():
                 session["winner"] = session["username"]
             else:
                 session["winner"] = "Draw"
+        finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
 
-        if result1 != 0 and result2 !=0:
+        if finished == 2:
             db.execute("DELETE * FROM gamecodes WHERE gameid=:gameid", gameid=code)
             session.clear()
         return render_template("result.html")
