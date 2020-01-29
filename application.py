@@ -179,15 +179,19 @@ def checkround():
     round_1 = round_1[0]["round_1"]
     round_2 = round_2[0]["round_2"]
     name = name[0]["username"]
+    print(round_1, round_2)
     # Checks if player one is in the same round as player 2
     if name == username:
         if round_1 > round_2:
             return jsonify(False)
         else:
+            print(1)
             return jsonify(True)
     elif round_2 > round_1:
+        print(2)
         return jsonify(False)
     else:
+        print(3)
         return jsonify(True)
 
 @app.route("/login", methods=["GET", "POST"])
@@ -588,7 +592,7 @@ def friendgame():
         else:
             session["multiply"] = "X1"
         # After 10 questions the round is finished
-        if session["question"] == 10:
+        if session["question"] == 2:
             session["question"] = 0
             # Get username of user
             username = user()
@@ -602,16 +606,16 @@ def friendgame():
                 score = score + score_old[0]['score_1']
                 session["score_1"] = score
                 round_old = db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid)
-                round = round_old[0]['round_1'] + 1
-                db.execute("UPDATE game SET round_1 = :round, score_1 = :score WHERE gameid = :gameid", round=round, score=score, gameid=gameid)
+                round_1 = round_old[0]['round_1'] + 1
+                db.execute("UPDATE game SET round_1=:round_1, score_1 = :score WHERE gameid = :gameid", round_1=round_1, score=score, gameid=gameid)
             # If the current user is not the game starter get score_2 from game and update it with the reached score
             else:
                 score_old= (db.execute("SELECT score_2 FROM game WHERE gameid=:gameid", gameid=gameid))
                 score = score + score_old[0]['score_2']
                 session["score_2"] = score
                 round_old = db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid)
-                round = round_old[0]['round_2'] + 1
-                db.execute("UPDATE game SET round_2 = :round, score_2 = :score WHERE gameid = :gameid", round=round, score=score, gameid=gameid)
+                round_2 = round_old[0]['round_2'] + 1
+                db.execute("UPDATE game SET round_2=:round_2, score_2=:score WHERE gameid=:gameid", round_2=round_2, score=score, gameid=gameid)
             # Get the amount of rounds the users has played. if the round is the same, the round index for userpage can be updated
             round_2= (db.execute("SELECT round_2 FROM game WHERE gameid=:gameid", gameid=gameid))[0]["round_2"]
             round_1= (db.execute("SELECT round_1 FROM game WHERE gameid=:gameid", gameid=gameid))[0]["round_1"]
