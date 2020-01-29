@@ -493,10 +493,8 @@ def result():
             else:
                 session["winner"] = "It's a draw"
         finished = db.execute("SELECT * FROM codegames WHERE gameid=:gameid", gameid=code)[0]["finished"]
-        if finished == 2:
-            db.execute("DELETE FROM codegames WHERE gameid=:gameid", gameid=code)
-            time.sleep(20)
-            session.clear()
+        #if finished == 2:
+            #db.execute("DELETE FROM codegames WHERE gameid=:gameid", gameid=code)
         return render_template("result.html")
 
 @app.route("/eind", methods=["GET", "POST"])
