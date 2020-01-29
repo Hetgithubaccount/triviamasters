@@ -615,9 +615,9 @@ def leaderbords():
         # Sort the highscores from highest to lowest and select the best 10
         hscores = (sorted(hscores, key = lambda i: int(i['highscore']), reverse=True))[:10]
         # Zip the lists together to make a the jinja forloop possible
-        rangschikking = zip(hscores,user_count)
+        ranking = zip(hscores,user_count)
         # Send the lists to leaderboards.html
-        return render_template("leaderboards.html", rangschikking=rangschikking)
+        return render_template("leaderboards.html", ranking=ranking)
 
 @app.route("/about", methods=["GET", "POST"])
 def about():
